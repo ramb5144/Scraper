@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Custom Highlight API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-content {
+            border: 1px solid #ccc;
+            padding: 20px;
+            margin: 20px 0;
+            background: #f9f9f9;
+        }
+        ::highlight(search-results) {
+            background-color: #fff59d;
+            color: inherit;
+        }
+        ::highlight(search-current) {
+            background-color: #ff9632;
+            color: inherit;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 15px;
+            background: #e3f2fd;
+            border-radius: 4px;
+        }
+        button {
+            padding: 8px 16px;
+            margin: 5px;
+            cursor: pointer;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            background: #fff;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS Custom Highlight API Test</h1>
+
+    <div class="controls">
+        <h3>Test Controls</h3>
+        <button id="highlightBtn">Highlight "text"</button>
+        <button id="clearBtn">Clear Highlights</button>
+        <button id="inspectBtn">Inspect DOM</button>
+        <div class="status" id="status">Ready</div>
+    </div>
+
+    <div class="test-content" id="testContent">
+        <h2>Test Content</h2>
+        <p>This is some text with the word text appearing multiple times in the text.</p>
+        <p>Let's test if the DOM structure remains unchanged when we highlight text.</p>
+        <ul>
+            <li>First item with text</li>
+            <li>Second item with more text content</li>
+            <li>Third item</li>
+        </ul>
+        <p>Final paragraph with <strong>styled text</strong> and <em>emphasized text</em>.</p>
+    </div>
+
+    <script>
+        let highlightRanges = [];
+
+        // Function to find and highlight all occurrences of a word
+        function highlightWord(word) {
+            clearHighlights();
+
+            const ranges = [];
+            const walker = document.createTreeWalker(
+                document.getElementById('testContent'),
+                NodeFilter.SHOW_TEXT,
+                null
+            );
+
+            let textNode;
+            while (textNode = walker.nextNode()) {
+                const text = textNode.textContent;
+                let index = 0;
+
+                while ((index = text.toLowerCase().indexOf(word.toLowerCase(), index)) !== -1) {
+                    const range = document.createRange();
+                    range.setStart(textNode, index);
+                    range.setEnd(textNode, index + word.length);
+                    ranges.push(range);
+                    index += word.length;
+                }
+            }
+
+            if (ranges.length > 0) {
+                highlightRanges = ranges;
+
+                // Highlight all ranges
+                const allHighlight = new Highlight(...ranges);
+                CSS.highlights.set('search-results', allHighlight);
+
+                // Highlight first range as current
+                const currentHighlight = new Highlight(ranges[0]);
+                CSS.highlights.set('search-current', currentHighlight);
+
+                document.getElementById('status').textContent =
+                    `Highlighted ${ranges.length} occurrences. DOM structure unchanged!`;
+            } else {
+                document.getElementById('status').textContent = 'No matches found.';
+            }
+        }
+
+        function clearHighlights() {
+            if (CSS.highlights) {
+                CSS.highlights.delete('search-results');
+                CSS.highlights.delete('search-current');
+            }
+            highlightRanges = [];
+            document.getElementById('status').textContent = 'Highlights cleared. DOM remains pristine.';
+        }
+
+        function inspectDOM() {
+            const content = document.getElementById('testContent');
+            const walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, null);
+
+            let textNodeCount = 0;
+            let totalLength = 0;
+            let hasMarkElements = false;
+
+            let node;
+            while (node = walker.nextNode()) {
+                textNodeCount++;
+                totalLength += node.textContent.length;
+            }
+
+            // Check for mark elements
+            const marks = document.querySelectorAll('.test-content mark');
+            hasMarkElements = marks.length > 0;
+
+            const status = document.getElementById('status');
+            status.innerHTML = `
+                <strong>DOM Inspection:</strong><br>
+                Text nodes: ${textNodeCount}<br>
+                Total text length: ${totalLength}<br>
+                Mark elements: ${hasMarkElements ? marks.length : '0 (none!)'}<br>
+                Highlights active: ${highlightRanges.length}<br>
+                <strong>${hasMarkElements ? '⚠️ DOM MODIFIED!' : '✅ DOM UNCHANGED!'}</strong>
+            `;
+        }
+
+        // Event listeners
+        document.getElementById('highlightBtn').addEventListener('click', () => highlightWord('text'));
+        document.getElementById('clearBtn').addEventListener('click', clearHighlights);
+        document.getElementById('inspectBtn').addEventListener('click', inspectDOM);
+
+        // Initial DOM inspection
+        setTimeout(inspectDOM, 100);
+    </script>
+</body>
+</html>

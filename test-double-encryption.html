@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Double Encryption on Re-render</title>
+</head>
+<body>
+    <h1>Double Encryption Test</h1>
+
+    <div id="app">
+        <p id="test-text">Hello World</p>
+    </div>
+
+    <button onclick="simulateRerender()">Simulate Framework Re-render</button>
+    <button onclick="checkState()">Check State</button>
+
+    <div id="output"></div>
+
+    <script src="/client/cloak-sdk.js"></script>
+    <script>
+        // Initialize SDK
+        CloakSDK.init({
+            apiKey: 'test_key',
+            debug: true
+        });
+
+        function simulateRerender() {
+            // Simulate what React/Vue/Angular does: innerHTML replacement
+            const app = document.getElementById('app');
+            const currentHTML = app.innerHTML;
+
+            console.log('[Test] Before re-render, innerHTML:', currentHTML);
+
+            // This is what frameworks do - they replace the entire innerHTML
+            // This creates NEW DOM nodes, even if the content is identical
+            app.innerHTML = currentHTML;
+
+            console.log('[Test] After re-render, innerHTML:', app.innerHTML);
+
+            // Wait a bit for MutationObserver to process
+            setTimeout(() => {
+                console.log('[Test] After MutationObserver processing, innerHTML:', app.innerHTML);
+            }, 500);
+        }
+
+        function checkState() {
+            const testText = document.getElementById('test-text');
+            if (!testText) {
+                console.log('[Test] Text node not found');
+                return;
+            }
+
+            const textNode = testText.firstChild;
+            console.log('[Test] Current text:', textNode.nodeValue);
+            console.log('[Test] Has _cloakEncrypted marker:', textNode._cloakEncrypted);
+            console.log('[Test] In plaintextStorage:', window.CloakSDK._debug?.plaintextStorage?.has(textNode));
+
+            const stats = CloakSDK.getStats();
+            console.log('[Test] Stats:', stats);
+
+            // Output to page
+            const output = document.getElementById('output');
+            output.innerHTML = `
+                <h3>Current State:</h3>
+                <p><strong>Text:</strong> ${textNode.nodeValue}</p>
+                <p><strong>Has marker:</strong> ${textNode._cloakEncrypted}</p>
+                <p><strong>Total characters tracked:</strong> ${stats.totalCharacters}</p>
+                <p><strong>Node count:</strong> ${stats.nodeCount}</p>
+            `;
+        }
+    </script>
+</body>
+</html>

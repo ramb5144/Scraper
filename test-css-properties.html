@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS Property Detection Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        .test-section h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        .expected {
+            background-color: #e8f5e9;
+            padding: 10px;
+            margin: 10px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .test-item {
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 3px;
+        }
+
+        .label {
+            font-weight: bold;
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        /* Test Cases */
+        .text-transform-upper {
+            text-transform: uppercase;
+        }
+
+        .text-transform-lower {
+            text-transform: lowercase;
+        }
+
+        .text-transform-capitalize {
+            text-transform: capitalize;
+        }
+
+        .font-variant-small-caps {
+            font-variant: small-caps;
+        }
+
+        .font-variant-caps-small {
+            font-variant-caps: small-caps;
+        }
+
+        .font-variant-caps-all-small {
+            font-variant-caps: all-small-caps;
+        }
+
+        .webkit-text-security-disc {
+            -webkit-text-security: disc;
+        }
+
+        .webkit-text-security-circle {
+            -webkit-text-security: circle;
+        }
+
+        .writing-mode-vertical {
+            writing-mode: vertical-rl;
+            height: 200px;
+        }
+
+        .combined-transforms {
+            text-transform: uppercase;
+            font-variant: small-caps;
+        }
+
+        /* Font feature settings test - requires a font that supports OpenType features */
+        .font-features-smcp {
+            font-feature-settings: "smcp" 1;
+        }
+    </style>
+</head>
+<body>
+    <h1>CSS Property Detection Test</h1>
+    <p>This page tests the SDK's ability to detect and handle various CSS properties that affect text rendering.</p>
+
+    <div class="test-section">
+        <h3>1. Text Transform Properties (Should be COMPENSATED)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should be encrypted AND transformed. No gibberish.
+        </div>
+
+        <div class="test-item">
+            <div class="label">text-transform: uppercase</div>
+            <div class="text-transform-upper">hello world</div>
+        </div>
+
+        <div class="test-item">
+            <div class="label">text-transform: lowercase</div>
+            <div class="text-transform-lower">HELLO WORLD</div>
+        </div>
+
+        <div class="test-item">
+            <div class="label">text-transform: capitalize</div>
+            <div class="text-transform-capitalize">hello world this is a test</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>2. Font Variant Properties (Should be COMPENSATED)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should be encrypted with uppercase transformation. No gibberish.
+        </div>
+
+        <div class="test-item">
+            <div class="label">font-variant: small-caps</div>
+            <div class="font-variant-small-caps">Hello World Small Caps</div>
+        </div>
+
+        <div class="test-item">
+            <div class="label">font-variant-caps: small-caps</div>
+            <div class="font-variant-caps-small">Hello World Small Caps</div>
+        </div>
+
+        <div class="test-item">
+            <div class="label">font-variant-caps: all-small-caps</div>
+            <div class="font-variant-caps-all-small">Hello World All Small Caps</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>3. Text Security Properties (Should be EXCLUDED)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should NOT be encrypted. Should show as bullets/circles in plaintext.
+        </div>
+
+        <div class="test-item">
+            <div class="label">-webkit-text-security: disc</div>
+            <div class="webkit-text-security-disc">password123</div>
+        </div>
+
+        <div class="test-item">
+            <div class="label">-webkit-text-security: circle</div>
+            <div class="webkit-text-security-circle">password456</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>4. Writing Mode Properties (Should be EXCLUDED)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should NOT be encrypted. Should show vertical in plaintext.
+        </div>
+
+        <div class="test-item">
+            <div class="label">writing-mode: vertical-rl</div>
+            <div class="writing-mode-vertical">Vertical Text</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>5. Combined Properties (Should be COMPENSATED)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should be encrypted with BOTH transforms applied. No gibberish.
+        </div>
+
+        <div class="test-item">
+            <div class="label">text-transform: uppercase + font-variant: small-caps</div>
+            <div class="combined-transforms">hello world combined</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>6. Font Feature Settings (Should be COMPENSATED if smcp/c2sc)</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should be encrypted with uppercase transformation. No gibberish.
+            <br><em>Note: Visual small-caps may not appear without appropriate font.</em>
+        </div>
+
+        <div class="test-item">
+            <div class="label">font-feature-settings: "smcp" 1</div>
+            <div class="font-features-smcp">hello world features</div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h3>Control Test - No CSS Properties</h3>
+        <div class="expected">
+            <strong>Expected:</strong> Text should be encrypted normally. No gibberish.
+        </div>
+
+        <div class="test-item">
+            <div class="label">No CSS properties applied</div>
+            <div>This is normal text without any special CSS properties</div>
+        </div>
+    </div>
+
+    <!-- Load SDK -->
+    <script src="client/cloak-sdk.js"></script>
+    <script src="test-css-detection.js"></script>
+    <script>
+        // Initialize SDK with debug mode
+        CloakSDK.init({
+            apiKey: 'test-key-12345',
+            debug: true,
+            autoEncrypt: true
+        });
+
+        // Log results after encryption
+        setTimeout(() => {
+            console.log('=== ENCRYPTION COMPLETE ===');
+            console.log('Check the page to verify:');
+            console.log('1. text-transform elements show correct case (no gibberish)');
+            console.log('2. font-variant elements show uppercase (no gibberish)');
+            console.log('3. -webkit-text-security elements NOT encrypted (show as bullets)');
+            console.log('4. writing-mode elements NOT encrypted (show vertical plaintext)');
+            console.log('5. combined properties show both transforms applied (no gibberish)');
+            console.log('\n Run testCSSPropertyDetection() to verify programmatically');
+        }, 2000);
+    </script>
+</body>
+</html>

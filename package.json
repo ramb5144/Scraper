@@ -1,0 +1,26 @@
+{
+  "name": "cloak-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {},
+  "bin": {
+    "inner-scrape": "./scraper/innertext_scrape.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/25tyler/cloak-api.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/25tyler/cloak-api/issues"
+  },
+  "homepage": "https://github.com/25tyler/cloak-api#readme",
+  "devDependencies": {
+    "@playwright/test": "^1.58.0",
+    "@types/node": "^25.0.10"
+  }
+}

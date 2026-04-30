@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Framework Re-render Double Encryption Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 20px 0;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            margin: 5px;
+            padding: 10px 15px;
+            background: #007bff;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .output {
+            margin-top: 10px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 3px;
+            font-family: monospace;
+            white-space: pre-wrap;
+        }
+        .success {
+            color: green;
+            font-weight: bold;
+        }
+        .error {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Framework Re-render Double Encryption Test</h1>
+
+    <div class="test-section">
+        <h2>Test Content</h2>
+        <div id="app">
+            <p id="test-text">Hello World this is a test</p>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>Actions</h2>
+        <button onclick="runTest()">Run Full Test</button>
+        <button onclick="simulateRerender()">Step 1: Simulate Re-render</button>
+        <button onclick="checkState()">Step 2: Check State</button>
+        <button onclick="resetTest()">Reset Test</button>
+    </div>
+
+    <div class="test-section">
+        <h2>Results</h2>
+        <div id="output" class="output">Waiting for test...</div>
+    </div>
+
+    <script src="/client/cloak-sdk.js"></script>
+    <script>
+        let initialEncryptedText = '';
+        let logs = [];
+
+        function log(message, isError = false) {
+            const timestamp = new Date().toISOString().split('T')[1].split('.')[0];
+            logs.push(`[${timestamp}] ${message}`);
+            updateOutput();
+        }
+
+        function updateOutput() {
+            document.getElementById('output').innerHTML = logs.join('\n');
+        }
+
+        // Initialize SDK
+        CloakSDK.init({
+            apiKey: 'test_key',
+            debug: false  // Disable debug to reduce noise
+        }).then(() => {
+            log('✓ SDK initialized');
+
+            // Wait for initial encryption to complete
+            setTimeout(() => {
+                const testText = document.getElementById('test-text');
+                if (testText && testText.firstChild) {
+                    initialEncryptedText = testText.firstChild.nodeValue;
+                    log(`✓ Initial encryption complete: "${initialEncryptedText}"`);
+                }
+            }, 1000);
+        }).catch(err => {
+            log(`✗ SDK initialization failed: ${err}`, true);
+        });
+
+        function simulateRerender() {
+            log('\n=== SIMULATING FRAMEWORK RE-RENDER ===');
+            const app = document.getElementById('app');
+            const currentHTML = app.innerHTML;
+
+            log(`Current innerHTML: ${currentHTML.substring(0, 100)}...`);
+
+            // This is what React/Vue/Angular does - replace innerHTML
+            // This creates NEW DOM nodes, even if content is identical
+            app.innerHTML = currentHTML;
+
+            log('✓ innerHTML replaced (new DOM nodes created)');
+
+            // Wait for MutationObserver to process
+            setTimeout(() => {
+                log('✓ MutationObserver processing complete');
+                checkState();
+            }, 500);
+        }
+
+        function checkState() {
+            log('\n=== CHECKING STATE ===');
+            const testText = document.getElementById('test-text');
+            if (!testText || !testText.firstChild) {
+                log('✗ Text node not found', true);
+                return;
+            }
+
+            const textNode = testText.firstChild;
+            const currentText = textNode.nodeValue;
+            const hasMarker = textNode._cloakEncrypted;
+
+            log(`Current text: "${currentText}"`);
+            log(`Initial encrypted text: "${initialEncryptedText}"`);
+            log(`Has _cloakEncrypted marker: ${hasMarker}`);
+
+            // Check if text matches initial encryption (not double-encrypted)
+            if (currentText === initialEncryptedText) {
+                log('✓ SUCCESS: Text matches initial encryption (no double-encryption)', false);
+                log('✓ Fix is working correctly!', false);
+            } else {
+                log('✗ FAILURE: Text changed after re-render (double-encryption occurred)', true);
+                log(`✗ Expected: "${initialEncryptedText}"`, true);
+                log(`✗ Got: "${currentText}"`, true);
+            }
+
+            const stats = CloakSDK.getStats();
+            log(`\nTotal characters: ${stats.totalCharacters}`);
+            log(`Node count: ${stats.nodeCount}`);
+        }
+
+        function resetTest() {
+            logs = [];
+            log('Test reset - reload page to run fresh test');
+            location.reload();
+        }
+
+        async function runTest() {
+            logs = [];
+            log('=== STARTING AUTOMATED TEST ===\n');
+
+            // Wait for SDK to initialize
+            await new Promise(resolve => setTimeout(resolve, 1500));
+
+            const testText = document.getElementById('test-text');
+            if (!testText || !testText.firstChild) {
+                log('✗ Test setup failed: no text node', true);
+                return;
+            }
+
+            initialEncryptedText = testText.firstChild.nodeValue;
+            log(`Initial encrypted text captured: "${initialEncryptedText}"\n`);
+
+            // Simulate re-render
+            log('Step 1: Simulating framework re-render...');
+            const app = document.getElementById('app');
+            app.innerHTML = app.innerHTML;
+            log('✓ innerHTML replaced\n');
+
+            // Wait for MutationObserver
+            await new Promise(resolve => setTimeout(resolve, 500));
+
+            log('Step 2: Checking results...');
+            checkState();
+        }
+    </script>
+</body>
+</html>

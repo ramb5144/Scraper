@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Transform Position Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-case {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .uppercase-test {
+            text-transform: uppercase;
+        }
+        .lowercase-test {
+            text-transform: lowercase;
+        }
+        .capitalize-test {
+            text-transform: capitalize;
+        }
+        .normal-text {
+            text-transform: none;
+        }
+        .instructions {
+            background: #fff3cd;
+            padding: 15px;
+            border-radius: 4px;
+            margin-bottom: 30px;
+        }
+        .expected {
+            background: #d4edda;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Transform Position Test</h1>
+
+    <div class="instructions">
+        <h2>Test Instructions:</h2>
+        <ol>
+            <li>Select and copy text from each test case</li>
+            <li>Paste into a text editor to verify</li>
+            <li>The pasted text should match the "Expected" output</li>
+            <li>Before fix: pasted text will be wrong (untransformed)</li>
+            <li>After fix: pasted text will be correct (transformed)</li>
+        </ol>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 1: Uppercase Transform</h3>
+        <p>DOM content: <code>hello world</code></p>
+        <p class="uppercase-test">hello world</p>
+        <div class="expected">Expected when copied: HELLO WORLD</div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 2: Lowercase Transform</h3>
+        <p>DOM content: <code>GOODBYE MOON</code></p>
+        <p class="lowercase-test">GOODBYE MOON</p>
+        <div class="expected">Expected when copied: goodbye moon</div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 3: Capitalize Transform</h3>
+        <p>DOM content: <code>the quick brown fox</code></p>
+        <p class="capitalize-test">the quick brown fox</p>
+        <div class="expected">Expected when copied: The Quick Brown Fox</div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 4: Mixed Content</h3>
+        <p>This test has <span class="uppercase-test">uppercase text</span> mixed with <span class="normal-text">normal text</span> and <span class="lowercase-test">LOWERCASE text</span> in one selection.</p>
+        <div class="expected">Expected when copied: This test has UPPERCASE TEXT mixed with normal text and lowercase text in one selection.</div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 5: Multi-line Selection</h3>
+        <h2 class="uppercase-test">breaking news headline</h2>
+        <p class="normal-text">This is the first paragraph with normal text.</p>
+        <p class="capitalize-test">this is the second paragraph with capitalize.</p>
+        <div class="expected">Expected when copied (if selecting all):
+BREAKING NEWS HEADLINE
+This is the first paragraph with normal text.
+This Is The Second Paragraph With Capitalize.</div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 6: Edge Case - Numbers and Special Characters</h3>
+        <p class="uppercase-test">test123 with $symbols% and punctuation!</p>
+        <div class="expected">Expected when copied: TEST123 WITH $SYMBOLS% AND PUNCTUATION!</div>
+    </div>
+
+    <script>
+        // Log copy events for debugging
+        document.addEventListener('copy', (e) => {
+            const selection = window.getSelection();
+            const text = selection.toString();
+            console.log('=== COPY EVENT ===');
+            console.log('Selection text:', text);
+            console.log('Selection range:', selection.rangeCount > 0 ? selection.getRangeAt(0) : null);
+        });
+
+        // Visual feedback
+        document.addEventListener('selectionchange', () => {
+            const selection = window.getSelection();
+            if (selection.toString().length > 0) {
+                console.log('Selected:', selection.toString());
+            }
+        });
+    </script>
+</body>
+</html>

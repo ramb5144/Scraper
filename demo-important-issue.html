@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Demonstrating !important Override Issue</title>
+    <style>
+        .demo {
+            padding: 20px;
+            margin: 20px;
+            border: 2px solid #ccc;
+        }
+        .uppercase {
+            text-transform: uppercase !important;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Demonstrating CSS !important Override</h1>
+
+    <div class="demo">
+        <h2>Test Element</h2>
+        <p class="uppercase" id="test">hello world</p>
+    </div>
+
+    <div class="demo">
+        <h2>Control Panel</h2>
+        <button onclick="tryNormalSet()">Try: element.style.textTransform = 'none'</button>
+        <button onclick="tryImportantSet()">Try: setProperty('text-transform', 'none', 'important')</button>
+        <button onclick="reset()">Reset</button>
+    </div>
+
+    <div class="demo">
+        <h2>Results</h2>
+        <pre id="results"></pre>
+    </div>
+
+    <script>
+        const element = document.getElementById('test');
+        const results = document.getElementById('results');
+
+        function showStatus() {
+            const computed = window.getComputedStyle(element);
+            const inline = element.style.getPropertyValue('text-transform');
+            const priority = element.style.getPropertyPriority('text-transform');
+
+            results.textContent =
+                `Computed text-transform: ${computed.textTransform}\n` +
+                `Inline text-transform: ${inline || '(none)'}\n` +
+                `Inline priority: ${priority || '(none)'}\n` +
+                `Visual display: ${element.textContent}`;
+        }
+
+        function tryNormalSet() {
+            element.style.textTransform = 'none';
+            results.textContent = 'Applied: element.style.textTransform = "none"\n\n';
+            setTimeout(showStatus, 100);
+        }
+
+        function tryImportantSet() {
+            element.style.setProperty('text-transform', 'none', 'important');
+            results.textContent = 'Applied: setProperty("text-transform", "none", "important")\n\n';
+            setTimeout(showStatus, 100);
+        }
+
+        function reset() {
+            element.style.removeProperty('text-transform');
+            results.textContent = 'Reset to original CSS\n\n';
+            setTimeout(showStatus, 100);
+        }
+
+        // Initial status
+        showStatus();
+    </script>
+</body>
+</html>

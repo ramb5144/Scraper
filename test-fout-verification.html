@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FOUT Fix Verification</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        .test-section { border: 2px solid #333; padding: 15px; margin: 20px 0; }
+        .pass { background-color: #d4edda; border-color: #28a745; }
+        .fail { background-color: #f8d7da; border-color: #dc3545; }
+        button { margin: 5px; padding: 10px; }
+        #log { border: 1px solid #ccc; padding: 10px; margin-top: 20px; font-family: monospace; font-size: 11px; max-height: 400px; overflow-y: auto; }
+        .metric { font-weight: bold; color: #007bff; }
+    </style>
+</head>
+<body>
+    <h1>FOUT Fix Verification Test</h1>
+    
+    <div class="test-section">
+        <h2>Test 1: Single innerHTML Update</h2>
+        <button onclick="testSingleUpdate()">Run Test</button>
+        <div id="content1">Initial content</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 2: Rapid Multiple Updates</h2>
+        <button onclick="testRapidUpdates()">Run Test</button>
+        <div id="content2">Initial content</div>
+    </div>
+    
+    <div class="test-section">
+        <h2>Test 3: Framework Simulation (React-like)</h2>
+        <button onclick="testFrameworkSimulation()">Run Test</button>
+        <div id="content3">Initial content</div>
+    </div>
+    
+    <div id="log"></div>
+    
+    <script src="client/cloak-sdk.js" data-api-key="test-key"></script>
+    <script>
+        let logEntries = [];
+        let testResults = [];
+        
+        function log(message, isMetric = false) {
+            const timestamp = performance.now().toFixed(2);
+            const prefix = `[${timestamp}ms]`;
+            const formatted = isMetric ? `<span class="metric">${prefix} ${message}</span>` : `${prefix} ${message}`;
+            logEntries.push(formatted);
+            updateLog();
+        }
+        
+        function updateLog() {
+            document.getElementById('log').innerHTML = logEntries.join('<br>');
+        }
+        
+        function clearLog() {
+            logEntries = [];
+            updateLog();
+        }
+        
+        // Test 1: Single innerHTML update
+        async function testSingleUpdate() {
+            clearLog();
+            log('=== TEST 1: Single innerHTML Update ===');
+            
+            const content = document.getElementById('content1');
+            const testText = 'Test content ' + Math.random().toString(36).substring(7);
+            const startTime = performance.now();
+            
+            log('Setting innerHTML...');
+            content.innerHTML = `<p>${testText}</p>`;
+            
+            // Measure at different intervals
+            const measurements = [];
+            for (let delay of [0, 1, 2, 5, 10, 15, 20]) {
+                await new Promise(resolve => setTimeout(resolve, delay));
+                const textNode = content.querySelector('p').firstChild;
+                const isPlaintext = textNode && textNode.nodeValue === testText;
+                const elapsed = (performance.now() - startTime).toFixed(2);
+                measurements.push({ delay, isPlaintext, elapsed });
+                log(`${delay}ms: plaintext=${isPlaintext}, elapsed=${elapsed}ms`);
+            }
+            
+            // Determine when encryption happened
+            const firstEncrypted = measurements.find(m => !m.isPlaintext);
+            if (firstEncrypted) {
+                log(`✓ Encrypted after ${firstEncrypted.elapsed}ms`, true);
+                if (parseFloat(firstEncrypted.elapsed) < 5) {
+                    log('✓ PASS: Encryption < 5ms (imperceptible)', true);
+                } else {
+                    log('✗ FAIL: Encryption took too long', true);
+                }
+            } else {
+                log('✗ FAIL: Content never encrypted', true);
+            }
+        }
+        
+        // Test 2: Rapid multiple updates
+        async function testRapidUpdates() {
+            clearLog();
+            log('=== TEST 2: Rapid Multiple Updates ===');
+            
+            const content = document.getElementById('content2');
+            const startTime = performance.now();
+            
+            log('Creating 10 rapid innerHTML updates...');
+            
+            // Simulate framework doing multiple updates
+            for (let i = 0; i < 10; i++) {
+                content.innerHTML = `<p>Update ${i} - ${Math.random().toString(36).substring(7)}</p>`;
+            }
+            
+            const afterUpdates = performance.now() - startTime;
+            log(`All updates completed in ${afterUpdates.toFixed(2)}ms`);
+            
+            // Wait and check
+            await new Promise(resolve => setTimeout(resolve, 20));
+            
+            const p = content.querySelector('p');
+            const isEncrypted = p && p.firstChild && p.firstChild.nodeValue !== p.textContent;
+            
+            const totalTime = performance.now() - startTime;
+            log(`Final check at ${totalTime.toFixed(2)}ms: encrypted=${!isEncrypted}`);
+            
+            if (!isEncrypted) {
+                log('✓ PASS: Batching worked, final content encrypted', true);
+            } else {
+                log('✗ FAIL: Content still plaintext', true);
+            }
+        }
+        
+        // Test 3: Framework simulation
+        async function testFrameworkSimulation() {
+            clearLog();
+            log('=== TEST 3: Framework Simulation ===');
+            
+            const content = document.getElementById('content3');
+            let renderCount = 0;
+            
+            function render(data) {
+                renderCount++;
+                content.innerHTML = `
+                    <div>
+                        <h3>Render #${renderCount}</h3>
+                        <p>${data.text}</p>
+                        <span>Timestamp: ${data.timestamp}</span>
+                    </div>
+                `;
+            }
+            
+            log('Initial render...');
+            const startTime = performance.now();
+            render({ text: 'First render', timestamp: Date.now() });
+            
+            await new Promise(resolve => setTimeout(resolve, 100));
+            
+            log('State update (like setState in React)...');
+            const updateTime = performance.now();
+            render({ text: 'Updated state', timestamp: Date.now() });
+            
+            // Check encryption speed
+            await new Promise(resolve => setTimeout(resolve, 5));
+            const checkTime = performance.now() - updateTime;
+            
+            const textNodes = Array.from(content.querySelectorAll('p, span'));
+            const allEncrypted = textNodes.every(node => {
+                const text = node.firstChild;
+                return text && text.nodeValue !== text.textContent;
+            });
+            
+            log(`Encryption check at ${checkTime.toFixed(2)}ms: allEncrypted=${allEncrypted}`);
+            
+            if (allEncrypted && checkTime < 10) {
+                log('✓ PASS: Framework-style updates encrypted quickly', true);
+            } else {
+                log(`✗ FAIL: Encryption too slow or incomplete`, true);
+            }
+        }
+        
+        // Auto-run basic test on load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                log('Page loaded, SDK initialized');
+                log('Ready to run tests');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

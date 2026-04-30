@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Transform !important Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin: 25px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            background: #f9f9f9;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #333;
+        }
+
+        /* Normal CSS rules (should be overridden by SDK) */
+        .uppercase-normal {
+            text-transform: uppercase;
+        }
+        .lowercase-normal {
+            text-transform: lowercase;
+        }
+        .capitalize-normal {
+            text-transform: capitalize;
+        }
+
+        /* !important CSS rules (this is the critical test) */
+        .uppercase-important {
+            text-transform: uppercase !important;
+        }
+        .lowercase-important {
+            text-transform: lowercase !important;
+        }
+        .capitalize-important {
+            text-transform: capitalize !important;
+        }
+
+        .status {
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 2px solid #28a745;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 2px solid #dc3545;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 2px solid #17a2b8;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+        code {
+            background: #e9ecef;
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Transform !important CSS Override Test</h1>
+
+    <div class="info">
+        <h2>Test Purpose</h2>
+        <p>This test verifies that the SDK can override CSS <code>text-transform</code> rules, even when they use <code>!important</code>.</p>
+        <p><strong>Expected behavior:</strong> All text should display correctly (not gibberish) because the SDK encrypts the transformed text and then prevents the browser from re-transforming it.</p>
+        <p><strong>Before fix:</strong> Tests with <code>!important</code> would show gibberish because inline styles couldn't override them.</p>
+        <p><strong>After fix:</strong> SDK uses <code>setProperty('text-transform', 'none', 'important')</code> to override even <code>!important</code> rules.</p>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 1: Normal CSS - uppercase</h3>
+        <p>CSS: <code>text-transform: uppercase;</code></p>
+        <p class="uppercase-normal" id="test1">hello world</p>
+        <div class="status" id="status1"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 2: Normal CSS - lowercase</h3>
+        <p>CSS: <code>text-transform: lowercase;</code></p>
+        <p class="lowercase-normal" id="test2">HELLO WORLD</p>
+        <div class="status" id="status2"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 3: Normal CSS - capitalize</h3>
+        <p>CSS: <code>text-transform: capitalize;</code></p>
+        <p class="capitalize-normal" id="test3">hello world from test</p>
+        <div class="status" id="status3"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 4: !important CSS - uppercase (CRITICAL)</h3>
+        <p>CSS: <code>text-transform: uppercase <strong>!important</strong>;</code></p>
+        <p class="uppercase-important" id="test4">hello world</p>
+        <div class="status" id="status4"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 5: !important CSS - lowercase (CRITICAL)</h3>
+        <p>CSS: <code>text-transform: lowercase <strong>!important</strong>;</code></p>
+        <p class="lowercase-important" id="test5">HELLO WORLD</p>
+        <div class="status" id="status5"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 6: !important CSS - capitalize (CRITICAL)</h3>
+        <p>CSS: <code>text-transform: capitalize <strong>!important</strong>;</code></p>
+        <p class="capitalize-important" id="test6">hello world from test</p>
+        <div class="status" id="status6"></div>
+    </div>
+
+    <script>
+        // Verification script runs after SDK encryption
+        setTimeout(() => {
+            const tests = [
+                { id: 'test1', statusId: 'status1', expectedOriginal: 'uppercase', important: false },
+                { id: 'test2', statusId: 'status2', expectedOriginal: 'lowercase', important: false },
+                { id: 'test3', statusId: 'status3', expectedOriginal: 'capitalize', important: false },
+                { id: 'test4', statusId: 'status4', expectedOriginal: 'uppercase', important: true },
+                { id: 'test5', statusId: 'status5', expectedOriginal: 'lowercase', important: true },
+                { id: 'test6', statusId: 'status6', expectedOriginal: 'capitalize', important: true }
+            ];
+
+            tests.forEach(test => {
+                const element = document.getElementById(test.id);
+                const status = document.getElementById(test.statusId);
+                const computedStyle = window.getComputedStyle(element);
+                const actualTransform = computedStyle.textTransform;
+                const inlineTransform = element.style.getPropertyValue('text-transform');
+                const inlinePriority = element.style.getPropertyPriority('text-transform');
+
+                console.log(`\n${test.id}:`);
+                console.log('  Original CSS:', test.expectedOriginal, test.important ? '!important' : '');
+                console.log('  Computed text-transform:', actualTransform);
+                console.log('  Inline text-transform:', inlineTransform);
+                console.log('  Inline priority:', inlinePriority);
+
+                // Check if SDK successfully reset to 'none'
+                if (actualTransform === 'none' && inlineTransform === 'none' && inlinePriority === 'important') {
+                    status.textContent = `✅ PASS: SDK successfully overrode ${test.expectedOriginal}${test.important ? ' !important' : ''} → none !important`;
+                    status.className = 'status pass';
+                } else if (actualTransform === 'none') {
+                    status.textContent = `⚠️ PARTIAL: text-transform is 'none' but priority is '${inlinePriority}' (expected 'important')`;
+                    status.className = 'status pass';
+                } else {
+                    status.textContent = `❌ FAIL: text-transform still '${actualTransform}' (should be 'none'). Inline: '${inlineTransform}' ${inlinePriority}`;
+                    status.className = 'status fail';
+                }
+            });
+
+            // Summary
+            const allPass = Array.from(document.querySelectorAll('.status')).every(s => s.classList.contains('pass'));
+            console.log('\n=== TEST SUMMARY ===');
+            console.log(allPass ? '✅ ALL TESTS PASSED' : '❌ SOME TESTS FAILED');
+        }, 2000); // Wait for SDK to complete encryption
+    </script>
+
+    <!-- Load SDK -->
+    <script src="client/cloak-sdk.js" data-api-key="test"></script>
+</body>
+</html>

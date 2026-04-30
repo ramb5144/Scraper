@@ -1,0 +1,43 @@
+# =============================================================================
+# Cloak API - Environment Variables Template
+# =============================================================================
+# Copy this to .env and fill in your values
+# For Railway: Add these as environment variables in the dashboard
+
+# -----------------------------------------------------------------------------
+# REQUIRED: Cloudflare R2 Storage (for fonts and plaintext)
+# Get from: Cloudflare Dashboard > R2 > Manage R2 API Tokens
+# -----------------------------------------------------------------------------
+R2_ACCOUNT_ID=your_account_id
+R2_ACCESS_KEY_ID=your_access_key_id
+R2_SECRET_ACCESS_KEY=your_secret_access_key
+R2_BUCKET_NAME=encrypted-fonts
+R2_PUBLIC_URL=https://pub-xxxxx.r2.dev
+
+# -----------------------------------------------------------------------------
+# REQUIRED: Database (Supabase PostgreSQL)
+# Get from: Supabase Dashboard > Settings > Database > Connection string
+# -----------------------------------------------------------------------------
+DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@db.YOUR_PROJECT.supabase.co:5432/postgres
+
+# -----------------------------------------------------------------------------
+# REQUIRED: Encryption Secret Key
+# Use a random 16-digit number
+# -----------------------------------------------------------------------------
+SECRET_KEY=6931718542855961
+
+# -----------------------------------------------------------------------------
+# OPTIONAL: Sentry Error Tracking
+# Get from: sentry.io > Settings > Client Keys (DSN)
+# -----------------------------------------------------------------------------
+# SENTRY_DSN=https://xxxxx@xxxxx.ingest.sentry.io/xxxxx
+# ENVIRONMENT=production
+
+# -----------------------------------------------------------------------------
+# OPTIONAL: API Configuration
+# -----------------------------------------------------------------------------
+# BASE_URL=https://your-app.railway.app
+# PORT=8001
+# DEBUG=false
+# ADMIN_SECRET=change_this_in_production
+

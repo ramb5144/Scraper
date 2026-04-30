@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloak SDK Test Page - Web Fonts (Google Fonts)</title>
+
+    <!-- Google Fonts - Playfair Display for headlines, Lora for body, Inter for UI -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+    <style>
+        /* ========================================
+           CSS RESET & BASE STYLES
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora', serif;
+            line-height: 1.6;
+            color: #333;
+            background: #f5f5f5;
+        }
+
+        /* ========================================
+           NAVIGATION - Inter (UI font)
+           ======================================== */
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #1a1a2e;
+            padding: 15px 30px;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            font-weight: 700;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 25px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        .nav-search {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .nav-search input {
+            padding: 8px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ========================================
+           BREAKING NEWS TICKER - Inter
+           ======================================== */
+        .breaking-news {
+            background: #e63946;
+            color: white;
+            padding: 10px 0;
+            overflow: hidden;
+        }
+
+        .ticker-wrapper {
+            display: flex;
+            align-items: center;
+        }
+
+        .ticker-label {
+            background: #fff;
+            color: #e63946;
+            padding: 5px 15px;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            text-transform: uppercase;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .ticker-content {
+            animation: ticker 20s linear infinite;
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        @keyframes ticker {
+            0% { transform: translateX(100%); }
+            100% { transform: translateX(-100%); }
+        }
+
+        /* ========================================
+           MAIN LAYOUT - CSS GRID
+           ======================================== */
+        .main-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 30px;
+        }
+
+        /* ========================================
+           HERO ARTICLE - Playfair Display headlines
+           ======================================== */
+        .hero-article {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-content {
+            padding: 30px;
+        }
+
+        .hero-category {
+            display: inline-block;
+            background: #e63946;
+            color: white;
+            padding: 5px 12px;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+
+        .hero-title {
+            font-size: 42px;
+            font-weight: 700;
+            line-height: 1.15;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .hero-excerpt {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.7;
+            font-family: 'Lora', serif;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* ========================================
+           ARTICLE BODY - Lora for body text
+           ======================================== */
+        .article-body {
+            padding: 30px;
+            background: white;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .article-body h2 {
+            font-size: 32px;
+            margin: 30px 0 15px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        .article-body h3 {
+            font-size: 24px;
+            margin: 25px 0 12px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .article-body p {
+            margin-bottom: 20px;
+            font-size: 18px;
+            line-height: 1.8;
+            font-family: 'Lora', serif;
+        }
+
+        /* Bold, Italic, Underline tests */
+        .article-body strong {
+            font-weight: 700;
+        }
+
+        .article-body em {
+            font-style: italic;
+        }
+
+        .article-body u {
+            text-decoration: underline;
+        }
+
+        /* Links with underline */
+        .article-body a {
+            color: #1a73e8;
+            text-decoration: underline;
+        }
+
+        .article-body a:hover {
+            color: #0d47a1;
+        }
+
+        /* ========================================
+           BLOCKQUOTE - Pull quote with Playfair
+           ======================================== */
+        .pull-quote {
+            border-left: 4px solid #e63946;
+            padding: 20px 30px;
+            margin: 30px 0;
+            background: #f9f9f9;
+            font-size: 26px;
+            font-style: italic;
+            color: #555;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .pull-quote cite {
+            display: block;
+            margin-top: 15px;
+            font-size: 14px;
+            font-style: normal;
+            color: #888;
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ========================================
+           LISTS - Lora
+           ======================================== */
+        .article-body ul, .article-body ol {
+            margin: 20px 0 20px 30px;
+            font-size: 18px;
+            font-family: 'Lora', serif;
+        }
+
+        .article-body li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        /* ========================================
+           DATA TABLE - Inter (UI font)
+           ======================================== */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .data-table th {
+            background: #1a1a2e;
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table td {
+            padding: 12px 15px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .data-table tr:hover {
+            background: #f5f5f5;
+        }
+
+        .data-table .number {
+            font-family: 'Inter', sans-serif;
+            font-variant-numeric: tabular-nums;
+            text-align: right;
+        }
+
+        /* ========================================
+           SIDEBAR - Inter for UI elements
+           ======================================== */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-widget {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .widget-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e63946;
+        }
+
+        /* ========================================
+           TRENDING STORIES - Mixed fonts
+           ======================================== */
+        .trending-list {
+            list-style: none;
+        }
+
+        .trending-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 700;
+            color: #ddd;
+            line-height: 1;
+        }
+
+        .trending-text {
+            font-size: 14px;
+            line-height: 1.4;
+            color: #333;
+            font-family: 'Lora', serif;
+        }
+
+        .trending-text a {
+            color: inherit;
+            text-decoration: none;
+        }
+
+        .trending-text a:hover {
+            color: #e63946;
+        }
+
+        /* ========================================
+           NEWSLETTER SIGNUP - Inter
+           ======================================== */
+        .newsletter-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .newsletter-form input[type="email"] {
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .newsletter-form button {
+            padding: 12px;
+            background: #e63946;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .newsletter-text {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.5;
+            font-family: 'Lora', serif;
+        }
+
+        /* ========================================
+           RELATED ARTICLES - Grid layout
+           ======================================== */
+        .related-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 25px;
+            margin-top: 30px;
+            padding: 30px;
+            background: white;
+            border-radius: 8px;
+        }
+
+        .related-card {
+            background: #f9f9f9;
+            border-radius: 6px;
+            overflow: hidden;
+        }
+
+        .related-image {
+            height: 150px;
+            background: linear-gradient(45deg, #f093fb, #f5576c);
+        }
+
+        .related-content {
+            padding: 15px;
+        }
+
+        .related-category {
+            font-size: 11px;
+            color: #e63946;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .related-title {
+            font-size: 16px;
+            margin-top: 8px;
+            line-height: 1.4;
+            font-family: 'Playfair Display', serif;
+            font-weight: 600;
+        }
+
+        .related-title a {
+            color: #333;
+            text-decoration: none;
+        }
+
+        .related-title a:hover {
+            color: #e63946;
+        }
+
+        /* ========================================
+           COMMENTS SECTION
+           ======================================== */
+        .comments-section {
+            background: white;
+            padding: 30px;
+            margin-top: 20px;
+            border-radius: 8px;
+        }
+
+        .comment {
+            display: flex;
+            gap: 15px;
+            padding: 20px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .comment-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #ddd;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+        }
+
+        .comment-date {
+            font-size: 12px;
+            color: #888;
+            margin-left: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .comment-text {
+            margin-top: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+            font-family: 'Lora', serif;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            margin-top: 50px;
+            padding: 50px 30px 30px;
+        }
+
+        .footer-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-brand {
+            font-size: 14px;
+            line-height: 1.7;
+            color: rgba(255,255,255,0.7);
+            font-family: 'Lora', serif;
+        }
+
+        .footer-brand h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            font-family: 'Playfair Display', serif;
+            font-weight: 700;
+        }
+
+        .footer-links h4 {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        .footer-links a {
+            display: block;
+            color: rgba(255,255,255,0.8);
+            text-decoration: none;
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .footer-links a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid rgba(255,255,255,0.1);
+            margin-top: 40px;
+            padding-top: 20px;
+            text-align: center;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* ========================================
+           SPECIAL TEXT CASES
+           ======================================== */
+        .all-caps {
+            text-transform: uppercase;
+        }
+
+        .small-caps {
+            font-variant: small-caps;
+        }
+
+        .letter-spaced {
+            letter-spacing: 3px;
+        }
+
+        /* Code/monospace text */
+        code {
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.9em;
+        }
+
+        pre {
+            background: #1a1a2e;
+            color: #a5d6ff;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, 'Courier New', monospace;
+            font-size: 14px;
+            line-height: 1.5;
+            margin: 20px 0;
+        }
+
+        /* ========================================
+           SPECIAL CHARACTERS TEST
+           ======================================== */
+        .special-chars-test {
+            background: #fff3cd;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+        }
+
+        .special-chars-test h4 {
+            margin-bottom: 15px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+        }
+
+        /* ========================================
+           RESPONSIVE
+           ======================================== */
+        @media (max-width: 968px) {
+            .main-container {
+                grid-template-columns: 1fr;
+            }
+
+            .related-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .nav-links {
+                display: none;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .hero-title {
+                font-size: 28px;
+            }
+
+            .footer-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* ========================================
+           DEBUG PANEL
+           ======================================== */
+        .debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.9);
+            color: #0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            max-width: 300px;
+            z-index: 9999;
+        }
+
+        .debug-panel h5 {
+            color: #0f0;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .debug-panel .status {
+            margin: 5px 0;
+        }
+
+        .debug-panel .status.ok { color: #0f0; }
+        .debug-panel .status.error { color: #f00; }
+        .debug-panel .status.pending { color: #ff0; }
+    </style>
+</head>
+<body>
+    <!-- ==========================================
+         NAVIGATION BAR
+         ========================================== -->
+    <nav class="navbar">
+        <a href="/" class="nav-logo">The Digital Times</a>
+        <ul class="nav-links">
+            <li><a href="#">World</a></li>
+            <li><a href="#">Politics</a></li>
+            <li><a href="#">Business</a></li>
+            <li><a href="#">Technology</a></li>
+            <li><a href="#">Science</a></li>
+            <li><a href="#">Opinion</a></li>
+        </ul>
+        <div class="nav-search">
+            <input type="text" placeholder="Search...">
+        </div>
+    </nav>
+
+    <!-- ==========================================
+         BREAKING NEWS TICKER
+         ========================================== -->
+    <div class="breaking-news">
+        <div class="ticker-wrapper">
+            <span class="ticker-label">Breaking News</span>
+            <div class="ticker-content">
+                LATEST: Supreme Court issues landmark ruling on digital privacy rights | Markets surge as Fed signals rate pause | Scientists announce breakthrough in fusion energy research | World leaders gather for emergency climate summit
+            </div>
+        </div>
+    </div>
+
+    <!-- ==========================================
+         MAIN CONTENT AREA
+         ========================================== -->
+    <main class="main-container">
+        <div class="content-area">
+            <!-- Hero Article -->
+            <article class="hero-article">
+                <div class="hero-image">
+                    [Featured Image Placeholder]
+                </div>
+                <div class="hero-content">
+                    <span class="hero-category">Technology</span>
+                    <h1 class="hero-title">Artificial Intelligence Revolution Transforms Global Industries as Companies Race to Adapt</h1>
+                    <p class="hero-excerpt">A comprehensive analysis reveals how machine learning and neural networks are reshaping everything from healthcare diagnostics to financial markets, raising both opportunities and ethical concerns.</p>
+                    <div class="hero-meta">
+                        <span>By <span class="author-name">Sarah Mitchell</span></span>
+                        <span>January 21, 2026</span>
+                        <span>12 min read</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Article Body with Typography Tests -->
+            <div class="article-body">
+                <p>The rapid advancement of artificial intelligence technologies has created a paradigm shift across virtually every sector of the global economy. From <strong>automated manufacturing processes</strong> to <em>sophisticated medical diagnostics</em>, the integration of AI systems represents what many experts consider the most significant technological transformation since the industrial revolution.</p>
+
+                <h2>The Current State of AI Adoption</h2>
+
+                <p>According to recent studies, approximately <strong>78% of Fortune 500 companies</strong> have implemented some form of AI technology within their operations. This represents a dramatic increase from just <u>23% five years ago</u>, highlighting the accelerating pace of adoption.</p>
+
+                <blockquote class="pull-quote">
+                    "We are witnessing a fundamental restructuring of how businesses operate. AI is not just a tool; it's becoming the backbone of modern enterprise."
+                    <cite>— Dr. James Chen, Director of MIT's Computer Science and Artificial Intelligence Laboratory</cite>
+                </blockquote>
+
+                <p>The implications extend far beyond simple automation. Machine learning algorithms are now capable of <a href="#">analyzing complex datasets</a>, identifying patterns that would be impossible for human analysts to detect, and making predictions with remarkable accuracy.</p>
+
+                <h3>Key Industries Being Transformed</h3>
+
+                <ul>
+                    <li><strong>Healthcare:</strong> AI-powered diagnostic tools can detect diseases earlier and more accurately than traditional methods</li>
+                    <li><strong>Finance:</strong> Algorithmic trading and fraud detection systems process millions of transactions per second</li>
+                    <li><strong>Manufacturing:</strong> Predictive maintenance reduces downtime by up to 45%</li>
+                    <li><strong>Retail:</strong> Personalization engines drive a 30% increase in conversion rates</li>
+                    <li><strong>Transportation:</strong> Autonomous vehicles are being tested in over 50 cities worldwide</li>
+                </ul>
+
+                <h3>Economic Impact Analysis</h3>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Sector</th>
+                            <th>AI Investment (2025)</th>
+                            <th>Projected Growth</th>
+                            <th>Jobs Impacted</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Healthcare</td>
+                            <td class="number">$45.2B</td>
+                            <td class="number">+34%</td>
+                            <td class="number">2.1M</td>
+                        </tr>
+                        <tr>
+                            <td>Financial Services</td>
+                            <td class="number">$38.7B</td>
+                            <td class="number">+28%</td>
+                            <td class="number">1.8M</td>
+                        </tr>
+                        <tr>
+                            <td>Manufacturing</td>
+                            <td class="number">$31.4B</td>
+                            <td class="number">+41%</td>
+                            <td class="number">3.2M</td>
+                        </tr>
+                        <tr>
+                            <td>Retail</td>
+                            <td class="number">$22.8B</td>
+                            <td class="number">+25%</td>
+                            <td class="number">1.5M</td>
+                        </tr>
+                        <tr>
+                            <td>Transportation</td>
+                            <td class="number">$19.3B</td>
+                            <td class="number">+52%</td>
+                            <td class="number">2.8M</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <h2>Technical Considerations</h2>
+
+                <p>The underlying technology powering these advances includes several key components. Modern neural networks, particularly <strong>transformer architectures</strong>, have demonstrated unprecedented capabilities in natural language processing and computer vision tasks.</p>
+
+                <pre><code>// Example: Simple neural network prediction
+const model = await tf.loadLayersModel('model.json');
+const prediction = model.predict(inputTensor);
+console.log('Confidence:', prediction.dataSync());</code></pre>
+
+                <p>The code above demonstrates a simplified example of how AI models can be deployed in production environments. The actual implementations used by major technology companies involve far more sophisticated architectures with billions of parameters.</p>
+
+                <!-- Special Characters Test -->
+                <div class="special-chars-test">
+                    <h4>Special Characters & Edge Cases Test:</h4>
+                    <p><strong>Punctuation:</strong> Hello, world! How are you? I'm fine; thanks for asking.</p>
+                    <p><strong>Numbers mixed:</strong> The year 2026 saw 15% growth, with $4.5 billion invested.</p>
+                    <p><strong>Quotes:</strong> She said "Hello" and he replied 'Goodbye' with a smile.</p>
+                    <p><strong>Special symbols:</strong> Email: test@example.com | Price: $99.99 | Ratio: 3:1</p>
+                    <p><strong>Parentheses:</strong> The result (as expected) was positive (mostly).</p>
+                    <p><strong>Dashes:</strong> The CEO—who was recently appointed—made the announcement.</p>
+                    <p><strong>Ellipsis:</strong> The story continues... but nobody knows how it ends...</p>
+                    <p><strong>Ampersand:</strong> Research & Development, Arts & Entertainment</p>
+                    <p><strong>Percentages:</strong> Sales increased 25% year-over-year, reaching 100% capacity.</p>
+                    <p><strong>ALL CAPS:</strong> <span class="all-caps">This text should be uppercase</span></p>
+                    <p><strong>Letter spacing:</strong> <span class="letter-spaced">SPACED OUT TEXT</span></p>
+                </div>
+
+                <h2>Ethical Implications</h2>
+
+                <p>The proliferation of AI technology raises important questions about privacy, employment, and societal impact. Critics argue that without proper regulation, these systems could exacerbate existing inequalities and create new forms of discrimination.</p>
+
+                <ol>
+                    <li>Data privacy concerns continue to mount as AI systems require vast amounts of personal information</li>
+                    <li>Job displacement threatens millions of workers in traditionally stable industries</li>
+                    <li>Algorithmic bias has been documented in hiring, lending, and criminal justice applications</li>
+                    <li>The environmental cost of training large AI models is increasingly significant</li>
+                    <li>Questions of accountability arise when AI systems make critical decisions</li>
+                </ol>
+
+                <p><em>Editor's note: This article is part of our ongoing series examining the intersection of technology and society. For more coverage, visit our <a href="#">Technology section</a>.</em></p>
+            </div>
+
+            <!-- Related Articles Grid -->
+            <section class="related-grid">
+                <h2 style="grid-column: 1 / -1; margin-bottom: 10px; font-family: 'Playfair Display', serif;">Related Stories</h2>
+
+                <article class="related-card">
+                    <div class="related-image"></div>
+                    <div class="related-content">
+                        <span class="related-category">Business</span>
+                        <h3 class="related-title"><a href="#">Tech Giants Report Record Quarterly Earnings Amid AI Boom</a></h3>
+                    </div>
+                </article>
+
+                <article class="related-card">
+                    <div class="related-image"></div>
+                    <div class="related-content">
+                        <span class="related-category">Science</span>
+                        <h3 class="related-title"><a href="#">New Study Reveals AI Can Predict Disease Outbreaks Weeks in Advance</a></h3>
+                    </div>
+                </article>
+
+                <article class="related-card">
+                    <div class="related-image"></div>
+                    <div class="related-content">
+                        <span class="related-category">Opinion</span>
+                        <h3 class="related-title"><a href="#">Why We Need Global AI Governance Before It's Too Late</a></h3>
+                    </div>
+                </article>
+            </section>
+
+            <!-- Comments Section -->
+            <section class="comments-section">
+                <h2 style="margin-bottom: 20px; font-family: 'Playfair Display', serif;">Reader Comments</h2>
+
+                <div class="comment">
+                    <div class="comment-avatar"></div>
+                    <div class="comment-content">
+                        <span class="comment-author">Michael Thompson</span>
+                        <span class="comment-date">2 hours ago</span>
+                        <p class="comment-text">Excellent analysis! I've seen firsthand how AI has transformed our manufacturing processes. The efficiency gains are remarkable, though I worry about long-term employment impacts for workers without technical skills.</p>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="comment-avatar"></div>
+                    <div class="comment-content">
+                        <span class="comment-author">Dr. Lisa Wang</span>
+                        <span class="comment-date">4 hours ago</span>
+                        <p class="comment-text">As someone working in healthcare AI, I can confirm the diagnostic capabilities mentioned here. However, it's crucial to remember that AI should augment—not replace—human medical judgment. The technology still has significant limitations.</p>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="comment-avatar"></div>
+                    <div class="comment-content">
+                        <span class="comment-author">Robert Garcia</span>
+                        <span class="comment-date">6 hours ago</span>
+                        <p class="comment-text">The ethical concerns raised here deserve more attention. We're moving fast, perhaps too fast, without fully understanding the consequences. Regulation needs to catch up with innovation.</p>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <!-- ==========================================
+             SIDEBAR
+             ========================================== -->
+        <aside class="sidebar">
+            <!-- Trending Stories Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Trending Now</h3>
+                <ul class="trending-list">
+                    <li class="trending-item">
+                        <span class="trending-number">1</span>
+                        <span class="trending-text"><a href="#">Federal Reserve Announces Unexpected Policy Shift</a></span>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-number">2</span>
+                        <span class="trending-text"><a href="#">Scientists Discover New Species in Deep Ocean Expedition</a></span>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-number">3</span>
+                        <span class="trending-text"><a href="#">Major Cybersecurity Breach Affects Millions of Users</a></span>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-number">4</span>
+                        <span class="trending-text"><a href="#">Championship Finals Set Record Television Ratings</a></span>
+                    </li>
+                    <li class="trending-item">
+                        <span class="trending-number">5</span>
+                        <span class="trending-text"><a href="#">Historic Peace Agreement Signed After Decades of Conflict</a></span>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Newsletter Signup Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Newsletter</h3>
+                <p class="newsletter-text">Get the latest news delivered to your inbox every morning. Stay informed with our daily briefing.</p>
+                <form class="newsletter-form">
+                    <input type="email" placeholder="Enter your email">
+                    <button type="submit">Subscribe</button>
+                </form>
+            </div>
+
+            <!-- Weather Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Weather</h3>
+                <div style="text-align: center; padding: 10px 0;">
+                    <div style="font-size: 48px; font-weight: 300; font-family: 'Inter', sans-serif;">72°F</div>
+                    <div style="color: #666; margin-top: 5px; font-family: 'Inter', sans-serif;">Partly Cloudy</div>
+                    <div style="margin-top: 15px; display: flex; justify-content: space-around; font-size: 13px; color: #888; font-family: 'Inter', sans-serif;">
+                        <span>High: 78°F</span>
+                        <span>Low: 65°F</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Market Data Widget -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Markets</h3>
+                <div style="font-family: 'Inter', sans-serif; font-size: 13px;">
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span>S&P 500</span>
+                        <span style="color: #22c55e;">+1.24%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span>NASDAQ</span>
+                        <span style="color: #22c55e;">+1.89%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #eee;">
+                        <span>DOW</span>
+                        <span style="color: #ef4444;">-0.32%</span>
+                    </div>
+                    <div style="display: flex; justify-content: space-between; padding: 8px 0;">
+                        <span>10Y Treasury</span>
+                        <span>4.52%</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+    </main>
+
+    <!-- ==========================================
+         FOOTER
+         ========================================== -->
+    <footer class="footer">
+        <div class="footer-grid">
+            <div class="footer-brand">
+                <h3>The Digital Times</h3>
+                <p>Delivering trusted journalism since 1892. Our commitment to factual reporting and in-depth analysis has made us one of the most respected news sources in the nation.</p>
+            </div>
+            <div class="footer-links">
+                <h4>Sections</h4>
+                <a href="#">World News</a>
+                <a href="#">U.S. Politics</a>
+                <a href="#">Business</a>
+                <a href="#">Technology</a>
+                <a href="#">Science</a>
+                <a href="#">Health</a>
+            </div>
+            <div class="footer-links">
+                <h4>Company</h4>
+                <a href="#">About Us</a>
+                <a href="#">Careers</a>
+                <a href="#">Contact</a>
+                <a href="#">Advertise</a>
+                <a href="#">Press Room</a>
+            </div>
+            <div class="footer-links">
+                <h4>Legal</h4>
+                <a href="#">Terms of Service</a>
+                <a href="#">Privacy Policy</a>
+                <a href="#">Cookie Settings</a>
+                <a href="#">Accessibility</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Digital Times. All rights reserved. | Contact: editor@digitaltimes.com</p>
+        </div>
+    </footer>
+
+    <!-- ==========================================
+         DEBUG PANEL
+         ========================================== -->
+    <div class="debug-panel" id="debugPanel">
+        <h5>Cloak SDK Debug</h5>
+        <div class="status pending" id="sdkStatus">SDK: Loading...</div>
+        <div class="status pending" id="fontStatus">Font: Pending...</div>
+        <div class="status pending" id="encryptStatus">Encryption: Pending...</div>
+        <div style="margin-top: 10px; font-size: 11px; color: #888;">
+            Press 'D' to toggle debug panel
+        </div>
+    </div>
+
+    <!-- ==========================================
+         CLOAK SDK INTEGRATION
+         ========================================== -->
+    <script src="/client/cloak-sdk.js"></script>
+    <script>
+        // Debug panel toggle
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'd' || e.key === 'D') {
+                const panel = document.getElementById('debugPanel');
+                panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
+            }
+        });
+
+        // Initialize Cloak SDK
+        document.addEventListener('DOMContentLoaded', async () => {
+            const sdkStatus = document.getElementById('sdkStatus');
+            const fontStatus = document.getElementById('fontStatus');
+            const encryptStatus = document.getElementById('encryptStatus');
+
+            try {
+                // Check if SDK loaded
+                if (typeof CloakSDK !== 'undefined' || typeof window.encryptText !== 'undefined') {
+                    sdkStatus.textContent = 'SDK: Loaded';
+                    sdkStatus.className = 'status ok';
+                } else {
+                    sdkStatus.textContent = 'SDK: Not found';
+                    sdkStatus.className = 'status error';
+                    return;
+                }
+
+                // Initialize encryption (if SDK has init function)
+                if (typeof CloakSDK !== 'undefined' && CloakSDK.init) {
+                    await CloakSDK.init({
+                        apiKey: 'test-key',
+                        debug: true
+                    });
+                    encryptStatus.textContent = 'Encryption: Active';
+                    encryptStatus.className = 'status ok';
+                } else {
+                    encryptStatus.textContent = 'Encryption: Manual mode';
+                    encryptStatus.className = 'status ok';
+                }
+
+                // Check font loading
+                if (document.fonts) {
+                    document.fonts.ready.then(() => {
+                        fontStatus.textContent = `Font: ${document.fonts.size} loaded`;
+                        fontStatus.className = 'status ok';
+                    });
+                }
+
+            } catch (error) {
+                console.error('Cloak SDK Error:', error);
+                sdkStatus.textContent = `SDK: Error - ${error.message}`;
+                sdkStatus.className = 'status error';
+            }
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text Transform Encryption Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-case {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+        }
+        .test-case h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        .uppercase-test {
+            text-transform: uppercase;
+        }
+        .lowercase-test {
+            text-transform: lowercase;
+        }
+        .capitalize-test {
+            text-transform: capitalize;
+        }
+        .none-test {
+            text-transform: none;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>Text Transform Encryption Verification Test</h1>
+    <p>This test verifies that CSS text-transform works correctly with encryption.</p>
+    <p><strong>Expected:</strong> Text should display correctly in the transformed case, not gibberish.</p>
+
+    <div class="test-case">
+        <h3>Test 1: uppercase transform</h3>
+        <div class="uppercase-test" id="test-uppercase">hello world</div>
+        <div class="status" id="status-uppercase"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 2: lowercase transform</h3>
+        <div class="lowercase-test" id="test-lowercase">HELLO WORLD</div>
+        <div class="status" id="status-lowercase"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 3: capitalize transform</h3>
+        <div class="capitalize-test" id="test-capitalize">hello world from test</div>
+        <div class="status" id="status-capitalize"></div>
+    </div>
+
+    <div class="test-case">
+        <h3>Test 4: none transform (baseline)</h3>
+        <div class="none-test" id="test-none">hello world</div>
+        <div class="status" id="status-none"></div>
+    </div>
+
+    <script>
+        // Manual verification script
+        setTimeout(() => {
+            // Check each test case
+            const tests = [
+                { id: 'test-uppercase', expected: 'uppercase', statusId: 'status-uppercase' },
+                { id: 'test-lowercase', expected: 'lowercase', statusId: 'status-lowercase' },
+                { id: 'test-capitalize', expected: 'capitalize', statusId: 'status-capitalize' },
+                { id: 'test-none', expected: 'none', statusId: 'status-none' }
+            ];
+
+            tests.forEach(test => {
+                const element = document.getElementById(test.id);
+                const status = document.getElementById(test.statusId);
+                const computedStyle = window.getComputedStyle(element);
+                const actualTransform = computedStyle.textTransform;
+
+                // Check if text-transform was reset to 'none' by SDK
+                if (actualTransform === 'none') {
+                    status.textContent = `✅ PASS: text-transform was reset to 'none' by SDK (was ${test.expected})`;
+                    status.className = 'status pass';
+                } else {
+                    status.textContent = `❌ FAIL: text-transform is still '${actualTransform}' (should be 'none')`;
+                    status.className = 'status fail';
+                }
+
+                // Also log the actual text content for manual inspection
+                console.log(`${test.id}:`, {
+                    originalTransform: test.expected,
+                    currentTransform: actualTransform,
+                    textContent: element.textContent
+                });
+            });
+        }, 2000); // Wait for SDK to encrypt
+    </script>
+
+    <script src="client/cloak-sdk.js" data-api-key="test"></script>
+</body>
+</html>

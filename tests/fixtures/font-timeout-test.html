@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Loading Timeout Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .status {
+            padding: 10px;
+            margin: 10px 0;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .success { background: #d4edda; color: #155724; }
+        .error { background: #f8d7da; color: #721c24; }
+        .warning { background: #fff3cd; color: #856404; }
+        .info { background: #d1ecf1; color: #0c5460; }
+    </style>
+</head>
+<body>
+    <h1>Font Loading Timeout Test</h1>
+
+    <div id="status" class="status info">
+        Test initialized. Waiting for results...
+    </div>
+
+    <h2>Test Scenarios</h2>
+    <p>This page tests the font loading timeout mechanism:</p>
+    <ul>
+        <li><strong>Expected:</strong> Page visible within 10 seconds even if fonts fail</li>
+        <li><strong>Expected:</strong> Warning message in console about font timeout</li>
+        <li><strong>Expected:</strong> Content still encrypted and readable with fallback font</li>
+    </ul>
+
+    <h2>Test Content</h2>
+    <p>This is some test content that should be encrypted. The quick brown fox jumps over the lazy dog. 0123456789.</p>
+    <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</p>
+
+    <script>
+        // Mock Cloak SDK with invalid font URL to trigger timeout
+        (function() {
+            const startTime = Date.now();
+            const statusEl = document.getElementById('status');
+
+            // Monitor visibility changes
+            const checkVisibility = setInterval(() => {
+                const elapsed = Date.now() - startTime;
+                const isVisible = document.body.style.visibility !== 'hidden';
+
+                if (isVisible) {
+                    const elapsedSeconds = (elapsed / 1000).toFixed(2);
+                    statusEl.className = 'status ' + (elapsed <= 11000 ? 'success' : 'warning');
+                    statusEl.textContent = `✓ Page became visible after ${elapsedSeconds}s`;
+                    clearInterval(checkVisibility);
+
+                    // Check console for timeout warning
+                    setTimeout(() => {
+                        const hasWarning = performance.getEntriesByType('console').some(e =>
+                            e.message && e.message.includes('Font loading')
+                        );
+                        if (hasWarning) {
+                            statusEl.textContent += ' | ✓ Timeout warning logged';
+                        }
+                    }, 100);
+                } else if (elapsed > 15000) {
+                    statusEl.className = 'status error';
+                    statusEl.textContent = `✗ FAILED: Page still hidden after ${(elapsed/1000).toFixed(2)}s`;
+                    clearInterval(checkVisibility);
+                }
+            }, 100);
+
+            // Log console warnings
+            const originalWarn = console.warn;
+            console.warn = function(...args) {
+                if (args[0] && args[0].includes('Font loading')) {
+                    console.log('✓ Font loading timeout warning detected:', ...args);
+                }
+                originalWarn.apply(console, args);
+            };
+        })();
+    </script>
+
+    <!--
+        To test with actual SDK:
+        1. Build SDK: npm run build
+        2. Modify fontUrl in server response to invalid URL (e.g., 404)
+        3. Add SDK script tag with invalid font config
+        4. Observe page becomes visible within 10s despite font failure
+    -->
+</body>
+</html>

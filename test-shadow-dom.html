@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shadow DOM Encryption Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+        }
+        .pass {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .fail {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .pending {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        button {
+            padding: 10px 20px;
+            margin: 5px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+            background-color: #007bff;
+            color: white;
+            font-size: 14px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Shadow DOM Encryption Test Suite</h1>
+    <p>This page tests whether the Cloak SDK properly encrypts text inside Shadow DOM.</p>
+
+    <div class="test-section">
+        <h2>Test 1: Basic Open Shadow Root</h2>
+        <p>A simple web component with open shadow root containing text.</p>
+        <div id="test1-container"></div>
+        <button onclick="runTest1()">Run Test 1</button>
+        <div id="test1-result" class="result pending">Waiting...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 2: Nested Shadow Roots</h2>
+        <p>Web components containing other web components (nested shadow DOM).</p>
+        <div id="test2-container"></div>
+        <button onclick="runTest2()">Run Test 2</button>
+        <div id="test2-result" class="result pending">Waiting...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 3: Dynamically Created Shadow Root</h2>
+        <p>Web component created after SDK initialization.</p>
+        <div id="test3-container"></div>
+        <button onclick="runTest3()">Run Test 3</button>
+        <div id="test3-result" class="result pending">Waiting...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 4: Closed Shadow Root</h2>
+        <p>Shadow root with mode='closed' (should handle gracefully).</p>
+        <div id="test4-container"></div>
+        <button onclick="runTest4()">Run Test 4</button>
+        <div id="test4-result" class="result pending">Waiting...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 5: Dynamic Content in Shadow Root</h2>
+        <p>Text added to shadow root after component creation.</p>
+        <div id="test5-container"></div>
+        <button onclick="runTest5()">Run Test 5</button>
+        <div id="test5-result" class="result pending">Waiting...</div>
+    </div>
+
+    <div class="test-section">
+        <h2>Test 6: Mixed Regular and Shadow DOM</h2>
+        <p>Ensure regular DOM encryption still works alongside shadow DOM.</p>
+        <div id="test6-container">
+            <p>Regular DOM text that should be encrypted</p>
+        </div>
+        <button onclick="runTest6()">Run Test 6</button>
+        <div id="test6-result" class="result pending">Waiting...</div>
+    </div>
+
+    <button onclick="runAllTests()" style="background-color: #28a745; font-size: 16px; font-weight: bold;">Run All Tests</button>
+
+    <script>
+        // Define web components for testing
+        class BasicShadowComponent extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = '<p>Secret plaintext in shadow DOM</p>';
+            }
+        }
+        customElements.define('basic-shadow', BasicShadowComponent);
+
+        class NestedOuterComponent extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = `
+                    <div>
+                        <p>Outer shadow text</p>
+                        <nested-inner></nested-inner>
+                    </div>
+                `;
+            }
+        }
+        customElements.define('nested-outer', NestedOuterComponent);
+
+        class NestedInnerComponent extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = '<p>Inner shadow text (nested)</p>';
+            }
+        }
+        customElements.define('nested-inner', NestedInnerComponent);
+
+        class ClosedShadowComponent extends HTMLElement {
+            constructor() {
+                super();
+                const shadow = this.attachShadow({ mode: 'closed' });
+                shadow.innerHTML = '<p>Closed shadow text (not accessible)</p>';
+                // Store reference so we can check it later
+                this._shadowRef = shadow;
+            }
+        }
+        customElements.define('closed-shadow', ClosedShadowComponent);
+
+        class DynamicContentComponent extends HTMLElement {
+            constructor() {
+                super();
+                this.attachShadow({ mode: 'open' });
+                this.shadowRoot.innerHTML = '<div id="dynamic-content"></div>';
+            }
+
+            addContent(text) {
+                const p = document.createElement('p');
+                p.textContent = text;
+                this.shadowRoot.getElementById('dynamic-content').appendChild(p);
+            }
+        }
+        customElements.define('dynamic-content', DynamicContentComponent);
+
+        // Helper function to check if text is encrypted
+        function isTextEncrypted(text) {
+            // Encrypted text will have characters from the custom font
+            // For this test, we'll check if the text has changed from original
+            // A more robust check would verify the font is applied
+            return text !== 'Secret plaintext in shadow DOM' &&
+                   text !== 'Outer shadow text' &&
+                   text !== 'Inner shadow text (nested)' &&
+                   text !== 'Regular DOM text that should be encrypted' &&
+                   text.length > 0;
+        }
+
+        // Helper to wait for encryption (batched with delay)
+        function waitForEncryption() {
+            return new Promise(resolve => setTimeout(resolve, 150));
+        }
+
+        // Test 1: Basic open shadow root
+        async function runTest1() {
+            const container = document.getElementById('test1-container');
+            const result = document.getElementById('test1-result');
+
+            container.innerHTML = '<basic-shadow></basic-shadow>';
+            await waitForEncryption();
+
+            const component = container.querySelector('basic-shadow');
+            const shadowText = component.shadowRoot.querySelector('p').textContent;
+
+            if (shadowText !== 'Secret plaintext in shadow DOM') {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Shadow DOM text was encrypted<br>Encrypted: "${shadowText}"`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Shadow DOM text is still plaintext<br>Found: "${shadowText}"`;
+            }
+        }
+
+        // Test 2: Nested shadow roots
+        async function runTest2() {
+            const container = document.getElementById('test2-container');
+            const result = document.getElementById('test2-result');
+
+            container.innerHTML = '<nested-outer></nested-outer>';
+            await waitForEncryption();
+
+            const outer = container.querySelector('nested-outer');
+            const outerText = outer.shadowRoot.querySelector('p').textContent;
+
+            const inner = outer.shadowRoot.querySelector('nested-inner');
+            const innerText = inner.shadowRoot.querySelector('p').textContent;
+
+            const outerEncrypted = outerText !== 'Outer shadow text';
+            const innerEncrypted = innerText !== 'Inner shadow text (nested)';
+
+            if (outerEncrypted && innerEncrypted) {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Both outer and inner shadow roots encrypted<br>` +
+                    `Outer: "${outerText}"<br>Inner: "${innerText}"`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Nested shadow roots not fully encrypted<br>` +
+                    `Outer encrypted: ${outerEncrypted} (${outerText})<br>` +
+                    `Inner encrypted: ${innerEncrypted} (${innerText})`;
+            }
+        }
+
+        // Test 3: Dynamically created shadow root
+        async function runTest3() {
+            const container = document.getElementById('test3-container');
+            const result = document.getElementById('test3-result');
+
+            // Create component after SDK is initialized
+            const component = document.createElement('basic-shadow');
+            container.innerHTML = '';
+            container.appendChild(component);
+
+            await waitForEncryption();
+
+            const shadowText = component.shadowRoot.querySelector('p').textContent;
+
+            if (shadowText !== 'Secret plaintext in shadow DOM') {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Dynamically created shadow root encrypted<br>Encrypted: "${shadowText}"`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Dynamic shadow root not encrypted<br>Found: "${shadowText}"`;
+            }
+        }
+
+        // Test 4: Closed shadow root
+        async function runTest4() {
+            const container = document.getElementById('test4-container');
+            const result = document.getElementById('test4-result');
+
+            container.innerHTML = '<closed-shadow></closed-shadow>';
+            await waitForEncryption();
+
+            const component = container.querySelector('closed-shadow');
+
+            // We can't access closed shadow roots from outside
+            // But we stored a reference in the component
+            const shadowText = component._shadowRef.querySelector('p').textContent;
+
+            // For closed shadow roots, SDK should handle gracefully (no errors)
+            // Text won't be encrypted because shadowRoot property is null
+            if (shadowText === 'Closed shadow text (not accessible)') {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Closed shadow root handled gracefully (not encrypted, as expected)<br>` +
+                    `Note: Closed shadow roots cannot be accessed by the SDK`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Unexpected behavior with closed shadow root`;
+            }
+        }
+
+        // Test 5: Dynamic content in shadow root
+        async function runTest5() {
+            const container = document.getElementById('test5-container');
+            const result = document.getElementById('test5-result');
+
+            container.innerHTML = '<dynamic-content></dynamic-content>';
+            const component = container.querySelector('dynamic-content');
+
+            await waitForEncryption();
+
+            // Add content after component is created and SDK has initialized
+            component.addContent('Dynamically added shadow text');
+
+            await waitForEncryption();
+
+            const shadowText = component.shadowRoot.querySelector('p').textContent;
+
+            if (shadowText !== 'Dynamically added shadow text') {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Dynamic content in shadow root encrypted<br>Encrypted: "${shadowText}"`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Dynamic shadow content not encrypted<br>Found: "${shadowText}"`;
+            }
+        }
+
+        // Test 6: Mixed regular and shadow DOM
+        async function runTest6() {
+            const container = document.getElementById('test6-container');
+            const result = document.getElementById('test6-result');
+
+            // Add a shadow component alongside regular DOM
+            const component = document.createElement('basic-shadow');
+            container.appendChild(component);
+
+            await waitForEncryption();
+
+            const regularText = container.querySelector('p').textContent;
+            const shadowText = component.shadowRoot.querySelector('p').textContent;
+
+            const regularEncrypted = regularText !== 'Regular DOM text that should be encrypted';
+            const shadowEncrypted = shadowText !== 'Secret plaintext in shadow DOM';
+
+            if (regularEncrypted && shadowEncrypted) {
+                result.className = 'result pass';
+                result.innerHTML = `PASS: Both regular and shadow DOM encrypted<br>` +
+                    `Regular: "${regularText}"<br>Shadow: "${shadowText}"`;
+            } else {
+                result.className = 'result fail';
+                result.innerHTML = `FAIL: Mixed DOM not fully encrypted<br>` +
+                    `Regular encrypted: ${regularEncrypted}<br>` +
+                    `Shadow encrypted: ${shadowEncrypted}`;
+            }
+        }
+
+        async function runAllTests() {
+            await runTest1();
+            await new Promise(r => setTimeout(r, 200));
+            await runTest2();
+            await new Promise(r => setTimeout(r, 200));
+            await runTest3();
+            await new Promise(r => setTimeout(r, 200));
+            await runTest4();
+            await new Promise(r => setTimeout(r, 200));
+            await runTest5();
+            await new Promise(r => setTimeout(r, 200));
+            await runTest6();
+        }
+
+        // Auto-run tests on load (after SDK initialization)
+        window.addEventListener('load', () => {
+            setTimeout(runAllTests, 1000);
+        });
+    </script>
+
+    <!-- Load Cloak SDK -->
+    <script src="client/cloak-sdk.js" data-api-key="test" data-debug="true"></script>
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Form Element Exclusion Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .test-section {
+            margin: 30px 0;
+            padding: 20px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+        }
+        .test-section h2 {
+            margin-top: 0;
+            color: #333;
+        }
+        .form-group {
+            margin: 15px 0;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input, textarea, select, button {
+            width: 100%;
+            padding: 8px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            border: none;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .contenteditable-box {
+            border: 1px solid #ccc;
+            padding: 10px;
+            min-height: 100px;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+        }
+        .expected {
+            background-color: #e7f3e7;
+            padding: 10px;
+            border-left: 4px solid #4CAF50;
+            margin: 10px 0;
+        }
+        .regular-text {
+            background-color: #fff3cd;
+            padding: 10px;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>Form Element Exclusion Test</h1>
+    <p>This page tests that form elements and contenteditable regions are properly excluded from encryption.</p>
+
+    <div class="expected">
+        <strong>Expected behavior:</strong> All form elements (inputs, textareas, selects, buttons) and contenteditable regions should show PLAIN TEXT. Regular paragraph text should be ENCRYPTED.
+    </div>
+
+    <div class="test-section">
+        <h2>1. Text Input Test</h2>
+        <div class="form-group">
+            <label>Text Input with Placeholder:</label>
+            <input type="text" placeholder="This placeholder should NOT be encrypted">
+        </div>
+        <div class="form-group">
+            <label>Text Input with Value:</label>
+            <input type="text" value="This value should NOT be encrypted">
+        </div>
+        <div class="form-group">
+            <label>Email Input:</label>
+            <input type="email" placeholder="email@example.com should NOT be encrypted">
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>2. Textarea Test</h2>
+        <div class="form-group">
+            <label>Textarea with Default Text:</label>
+            <textarea rows="4">This default textarea text should NOT be encrypted. Users should be able to edit this normally.</textarea>
+        </div>
+        <div class="form-group">
+            <label>Empty Textarea:</label>
+            <textarea rows="4" placeholder="Type here - text should NOT be encrypted"></textarea>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>3. Select/Option Test</h2>
+        <div class="form-group">
+            <label>Dropdown Select:</label>
+            <select>
+                <option>Option 1 should NOT be encrypted</option>
+                <option>Option 2 should NOT be encrypted</option>
+                <option>Option 3 should NOT be encrypted</option>
+            </select>
+        </div>
+        <div class="form-group">
+            <label>Select with Optgroup:</label>
+            <select>
+                <optgroup label="Group 1 should NOT be encrypted">
+                    <option>Choice A should NOT be encrypted</option>
+                    <option>Choice B should NOT be encrypted</option>
+                </optgroup>
+                <optgroup label="Group 2 should NOT be encrypted">
+                    <option>Choice C should NOT be encrypted</option>
+                    <option>Choice D should NOT be encrypted</option>
+                </optgroup>
+            </select>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>4. Button Test</h2>
+        <div class="form-group">
+            <button type="button">This button text should NOT be encrypted</button>
+        </div>
+        <div class="form-group">
+            <button type="submit">Submit button text should NOT be encrypted</button>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>5. Contenteditable Test</h2>
+        <div class="form-group">
+            <label>Contenteditable with true attribute:</label>
+            <div class="contenteditable-box" contenteditable="true">
+                This contenteditable text should NOT be encrypted. Users should be able to edit this text normally, like a WYSIWYG editor.
+            </div>
+        </div>
+        <div class="form-group">
+            <label>Contenteditable with empty attribute (also means true):</label>
+            <div class="contenteditable-box" contenteditable="">
+                This contenteditable text should also NOT be encrypted (contenteditable="" is same as contenteditable="true").
+            </div>
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>6. Label Test (Intentionally Encrypted)</h2>
+        <div class="regular-text">
+            <strong>Note:</strong> Labels are intentionally NOT excluded from encryption. This allows the page content to remain protected from scrapers while still being readable to legitimate users.
+        </div>
+        <div class="form-group">
+            <label>This label text SHOULD be encrypted (current behavior)</label>
+            <input type="text" placeholder="But this placeholder should NOT be encrypted">
+        </div>
+    </div>
+
+    <div class="test-section">
+        <h2>7. Regular Content Test (Should Be Encrypted)</h2>
+        <div class="regular-text">
+            <p>This is regular paragraph text that SHOULD be encrypted. This verifies that the SDK is still working for normal content while properly excluding form elements.</p>
+            <p>Another paragraph to ensure encryption is working correctly for non-form content.</p>
+        </div>
+    </div>
+
+    <!-- Load Cloak SDK -->
+    <script src="/cloak-sdk.js"></script>
+    <script>
+        // Initialize SDK - will be configured by server
+        console.log('Test page loaded. Check that:');
+        console.log('1. All form inputs show plain text');
+        console.log('2. All select options show plain text');
+        console.log('3. All button text shows plain text');
+        console.log('4. Contenteditable regions show plain text');
+        console.log('5. Regular paragraph text is encrypted');
+        console.log('6. Labels are encrypted (intentional)');
+    </script>
+</body>
+</html>

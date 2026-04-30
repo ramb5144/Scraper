@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Failure Test - Decryption Fallback</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .test-info {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .test-content {
+            background: #fff;
+            padding: 20px;
+            border: 2px solid #333;
+            border-radius: 5px;
+        }
+        h1 { color: #333; }
+        .expected {
+            color: #28a745;
+            font-weight: bold;
+        }
+        .actual {
+            color: #dc3545;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="test-info">
+        <h2>Test Instructions</h2>
+        <ol>
+            <li>Open browser console to see debug output</li>
+            <li>This page uses an <strong>invalid font URL</strong> that will fail (404)</li>
+            <li><span class="expected">EXPECTED:</span> After 10-second timeout, text below should be readable plaintext</li>
+            <li><span class="actual">FAILURE:</span> If you see gibberish like "Khoor Zruog", the fix didn't work</li>
+            <li>Console should show: "Decrypting content back to plaintext" and decrypted count</li>
+        </ol>
+    </div>
+
+    <div class="test-content">
+        <h1>Hello World - Font Failure Test</h1>
+        <p>This is a test of the font failure decryption fallback.</p>
+        <p>When the custom fonts fail to load (which they will, because we're using an invalid URL), the SDK should automatically decrypt all text back to plaintext.</p>
+        <p>You should see this text clearly, not as encrypted gibberish.</p>
+        <ul>
+            <li>First test item</li>
+            <li>Second test item</li>
+            <li>Third test item</li>
+        </ul>
+        <p><strong>Important:</strong> If you can read this clearly after the 10-second delay, the fix is working!</p>
+    </div>
+
+    <script src="/client/cloak-sdk.js"></script>
+    <script>
+        console.log('[Test] Font Failure Decryption Test Started');
+        console.log('[Test] This test verifies that text is decrypted to plaintext when fonts fail');
+        console.log('[Test] Expected behavior:');
+        console.log('[Test]   1. Page will be hidden initially');
+        console.log('[Test]   2. SDK will try to load fonts (will fail)');
+        console.log('[Test]   3. After timeout, SDK should decrypt all text');
+        console.log('[Test]   4. Page becomes visible with PLAINTEXT (not gibberish)');
+        console.log('[Test]');
+        console.log('[Test] Watch for: "Decrypting content back to plaintext" message');
+        console.log('[Test] ');
+
+        // You'll need to test this with a real API key and then modify the server
+        // to return an invalid font URL, OR manually inject invalid font URL after init
+
+        // For manual testing:
+        // 1. Initialize SDK normally with your API key
+        // 2. After fonts are loaded, manually replace the font URL in the style tag
+        // 3. Trigger a reload or font re-fetch to simulate failure
+
+        // Uncomment and add your API key to test:
+        /*
+        window.CloakSDK.init({
+            apiKey: 'YOUR_API_KEY_HERE',
+            debug: true,
+            fontLoadTimeout: 5000  // 5 seconds for faster testing
+        }).then(() => {
+            console.log('[Test] SDK initialized');
+
+            // Simulate font failure by replacing font URL with invalid one
+            setTimeout(() => {
+                const styleEl = document.getElementById('cloak-font-style');
+                if (styleEl) {
+                    console.log('[Test] Simulating font failure by injecting invalid URL...');
+                    const originalStyle = styleEl.textContent;
+                    styleEl.textContent = originalStyle.replace(/url\(['"]?[^'"]+['"]?\)/g, 'url("https://404.invalid/font.woff2")');
+
+                    // Force browser to try loading the invalid font
+                    document.fonts.ready.then(() => {
+                        console.log('[Test] Font loading state changed');
+                    });
+                }
+            }, 2000);
+        });
+        */
+
+        console.log('[Test]');
+        console.log('[Test] MANUAL TEST INSTRUCTIONS:');
+        console.log('[Test] 1. Uncomment the init code above and add your API key');
+        console.log('[Test] 2. OR modify server to return invalid font URL');
+        console.log('[Test] 3. Open this page and observe console');
+        console.log('[Test] 4. After timeout, check if text is readable plaintext or gibberish');
+        console.log('[Test]');
+    </script>
+</body>
+</html>

@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Visual Text Transform Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 40px; }
+        .test { margin: 20px 0; padding: 20px; border: 2px solid #ccc; }
+        .uppercase { text-transform: uppercase; }
+        .lowercase { text-transform: lowercase; }
+        .capitalize { text-transform: capitalize; }
+    </style>
+</head>
+<body>
+    <h1>Text Transform Visual Test</h1>
+    <p>If this works correctly, you should see properly transformed text, NOT gibberish.</p>
+
+    <div class="test">
+        <h3>Uppercase test:</h3>
+        <p class="uppercase">hello world this should be uppercase</p>
+    </div>
+
+    <div class="test">
+        <h3>Lowercase test:</h3>
+        <p class="lowercase">HELLO WORLD THIS SHOULD BE LOWERCASE</p>
+    </div>
+
+    <div class="test">
+        <h3>Capitalize test:</h3>
+        <p class="capitalize">hello world this should be capitalized</p>
+    </div>
+
+    <script>
+        // After SDK runs, check if text-transform was reset
+        setTimeout(() => {
+            const elements = document.querySelectorAll('.uppercase, .lowercase, .capitalize');
+            elements.forEach(el => {
+                const computed = window.getComputedStyle(el);
+                console.log('Element:', el.className);
+                console.log('  computed text-transform:', computed.textTransform);
+                console.log('  inline text-transform:', el.style.textTransform);
+                console.log('  text content:', el.textContent);
+                console.log('  ---');
+            });
+        }, 2000);
+    </script>
+
+    <!-- Load SDK with test key -->
+    <script src="client/cloak-sdk.js" data-api-key="test"></script>
+</body>
+</html>

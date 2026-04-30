@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FOUT Test</title>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        #content { border: 2px solid blue; padding: 10px; margin: 20px 0; }
+        button { margin: 5px; padding: 10px; }
+        #log { border: 1px solid #ccc; padding: 10px; margin-top: 20px; font-family: monospace; font-size: 12px; }
+    </style>
+</head>
+<body>
+    <h1>FOUT (Flash of Unencrypted Text) Test</h1>
+    
+    <p>This test measures the delay between innerHTML update and encryption.</p>
+    
+    <button onclick="testInnerHTML()">Test innerHTML Update</button>
+    <button onclick="clearLog()">Clear Log</button>
+    
+    <div id="content">Initial content</div>
+    
+    <div id="log"></div>
+    
+    <script src="client/cloak-sdk.js" data-api-key="test-key"></script>
+    <script>
+        let logEntries = [];
+        
+        function log(message) {
+            const timestamp = performance.now().toFixed(2);
+            logEntries.push(`[${timestamp}ms] ${message}`);
+            document.getElementById('log').innerHTML = logEntries.join('<br>');
+        }
+        
+        function clearLog() {
+            logEntries = [];
+            document.getElementById('log').innerHTML = '';
+        }
+        
+        function testInnerHTML() {
+            const content = document.getElementById('content');
+            const startTime = performance.now();
+            
+            log('BEFORE innerHTML update');
+            
+            // This simulates what frameworks do
+            content.innerHTML = '<p>NEW PLAINTEXT CONTENT - ' + Math.random().toString(36).substring(7) + '</p>';
+            
+            const afterUpdate = performance.now();
+            log(`AFTER innerHTML update (+${(afterUpdate - startTime).toFixed(2)}ms)`);
+            
+            // Check if text is encrypted yet
+            setTimeout(() => {
+                const isEncrypted = content.textContent !== content.querySelector('p').textContent;
+                const elapsed = performance.now() - startTime;
+                log(`5ms check: encrypted=${isEncrypted} (+${elapsed.toFixed(2)}ms)`);
+            }, 5);
+            
+            setTimeout(() => {
+                const elapsed = performance.now() - startTime;
+                log(`10ms check (+${elapsed.toFixed(2)}ms)`);
+            }, 10);
+            
+            setTimeout(() => {
+                const elapsed = performance.now() - startTime;
+                log(`15ms check (+${elapsed.toFixed(2)}ms)`);
+            }, 15);
+            
+            setTimeout(() => {
+                const elapsed = performance.now() - startTime;
+                log(`20ms check (+${elapsed.toFixed(2)}ms)`);
+            }, 20);
+            
+            setTimeout(() => {
+                const elapsed = performance.now() - startTime;
+                log(`25ms check (+${elapsed.toFixed(2)}ms)`);
+            }, 25);
+        }
+    </script>
+</body>
+</html>

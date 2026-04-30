@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Content Test - Cloak SDK</title>
+
+    <!-- TEST SCENARIO: Web Fonts via Link Tag
+         Fonts: Playfair Display (serif), Lora (serif), Inter (sans-serif)
+         Expected: SDK should detect and create CloakFont variants
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Lora:ital,wght@0,400;0,600;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <style>
+        /* TEST SCENARIO: Web Fonts via @import in CSS
+           Fonts: Roboto Slab, Source Sans Pro
+           Expected: SDK should detect these as well
+        */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@400;700&family=Source+Sans+3:wght@400;600&display=swap');
+
+        /* ========================================
+           RESET & BASE STYLES
+           ======================================== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Lora', Georgia, serif;
+            line-height: 1.6;
+            color: #222;
+            background: #f8f9fa;
+        }
+
+        /* ========================================
+           STICKY NAVIGATION
+           ======================================== */
+        .navbar {
+            position: sticky;
+            top: 0;
+            background: #1a1a2e;
+            padding: 15px 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+
+        .nav-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            font-weight: 900;
+            color: white;
+            text-decoration: none;
+            letter-spacing: -1px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: rgba(255,255,255,0.85);
+            text-decoration: none;
+            font-family: 'Inter', Arial, sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            transition: color 0.2s;
+        }
+
+        .nav-links a:hover {
+            color: white;
+        }
+
+        /* Dropdown menu */
+        .nav-item {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: #2a2a40;
+            min-width: 200px;
+            padding: 10px 0;
+            margin-top: 15px;
+            border-radius: 4px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .dropdown-menu a {
+            display: block;
+            padding: 10px 20px;
+            font-size: 13px;
+            text-transform: none;
+        }
+
+        .nav-item:hover .dropdown-menu {
+            display: block;
+        }
+
+        .nav-search-btn {
+            background: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            transition: all 0.2s;
+        }
+
+        .nav-search-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.5);
+        }
+
+        /* ========================================
+           BREAKING NEWS TICKER
+           ======================================== */
+        .breaking-news {
+            background: #dc3545;
+            color: white;
+            padding: 12px 0;
+            overflow: hidden;
+        }
+
+        .ticker-wrapper {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+        }
+
+        .ticker-label {
+            background: white;
+            color: #dc3545;
+            padding: 5px 15px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 20px;
+            flex-shrink: 0;
+        }
+
+        .ticker-content {
+            font-family: 'Source Sans 3', Verdana, sans-serif;
+            font-size: 14px;
+            font-weight: 400;
+            white-space: nowrap;
+            overflow: hidden;
+        }
+
+        .ticker-content span {
+            display: inline-block;
+            margin-right: 50px;
+        }
+
+        /* ========================================
+           MAIN LAYOUT
+           ======================================== */
+        .main-container {
+            max-width: 1200px;
+            margin: 30px auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+        }
+
+        /* ========================================
+           HERO ARTICLE SECTION
+           ======================================== */
+        .hero-article {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 400px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .hero-content {
+            padding: 35px;
+        }
+
+        .hero-category {
+            display: inline-block;
+            background: #dc3545;
+            color: white;
+            padding: 6px 14px;
+            font-family: 'Inter', sans-serif;
+            font-size: 11px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .hero-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 48px;
+            font-weight: 700;
+            line-height: 1.2;
+            margin-bottom: 20px;
+            color: #1a1a1a;
+        }
+
+        .hero-excerpt {
+            font-family: 'Lora', Georgia, serif;
+            font-size: 20px;
+            line-height: 1.7;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        .hero-meta {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: #888;
+        }
+
+        .author-name {
+            font-weight: 600;
+            color: #333;
+        }
+
+        /* ========================================
+           ARTICLE GRID
+           ======================================== */
+        .article-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .article-card {
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .article-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        }
+
+        .article-card-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .article-card-content {
+            padding: 20px;
+        }
+
+        .article-card-category {
+            display: inline-block;
+            background: #f0f0f0;
+            color: #666;
+            padding: 4px 10px;
+            font-family: 'Inter', sans-serif;
+            font-size: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .article-card-title {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 22px;
+            font-weight: 700;
+            line-height: 1.3;
+            margin-bottom: 10px;
+            color: #1a1a1a;
+        }
+
+        .article-card-excerpt {
+            font-family: 'Lora', Georgia, serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #666;
+            margin-bottom: 12px;
+        }
+
+        .article-card-meta {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #999;
+        }
+
+        /* Read More expandable content */
+        .read-more-wrapper {
+            margin-top: 10px;
+        }
+
+        .read-more-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .read-more-content.expanded {
+            max-height: 500px;
+        }
+
+        .read-more-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            cursor: pointer;
+            padding: 0;
+            margin-top: 5px;
+        }
+
+        .read-more-btn:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================
+           LOAD MORE SECTION
+           ======================================== */
+        .load-more-section {
+            text-align: center;
+            margin: 30px 0;
+        }
+
+        .load-more-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 14px 40px;
+            font-family: 'Inter', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .load-more-btn:hover {
+            background: #5568d3;
+        }
+
+        .load-more-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+
+        /* ========================================
+           LAZY LOAD SECTIONS
+           ======================================== */
+        .lazy-load-section {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+        }
+
+        .lazy-load-section.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* ========================================
+           TABS INTERFACE
+           ======================================== */
+        .tabs-container {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .tabs-header {
+            display: flex;
+            gap: 5px;
+            border-bottom: 2px solid #e0e0e0;
+            margin-bottom: 20px;
+        }
+
+        .tab-button {
+            background: none;
+            border: none;
+            padding: 12px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-button.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+
+        .tab-button:hover {
+            color: #667eea;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .tab-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 28px;
+            margin-bottom: 15px;
+        }
+
+        .tab-content p {
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #444;
+        }
+
+        /* ========================================
+           ACCORDION FAQ
+           ======================================== */
+        .accordion-container {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .accordion-item {
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .accordion-item:last-child {
+            border-bottom: none;
+        }
+
+        .accordion-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 18px 0;
+            cursor: pointer;
+            user-select: none;
+        }
+
+        .accordion-title {
+            font-family: 'Roboto Slab', Georgia, serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+        }
+
+        .accordion-icon {
+            font-size: 20px;
+            font-weight: bold;
+            color: #667eea;
+            transition: transform 0.3s;
+        }
+
+        .accordion-item.open .accordion-icon {
+            transform: rotate(45deg);
+        }
+
+        .accordion-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+
+        .accordion-content-inner {
+            padding-bottom: 18px;
+        }
+
+        .accordion-content p {
+            font-family: 'Lora', serif;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #555;
+        }
+
+        /* ========================================
+           SIDEBAR
+           ======================================== */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .sidebar-widget {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+        }
+
+        .widget-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #333;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #dc3545;
+        }
+
+        .trending-list {
+            list-style: none;
+        }
+
+        .trending-item {
+            display: flex;
+            gap: 15px;
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .trending-item:last-child {
+            border-bottom: none;
+        }
+
+        .trending-number {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            font-weight: 900;
+            color: #e0e0e0;
+            line-height: 1;
+        }
+
+        .trending-text {
+            font-family: 'Lora', serif;
+            font-size: 14px;
+            line-height: 1.4;
+            color: #333;
+        }
+
+        /* ========================================
+           COMMENTS SECTION
+           ======================================== */
+        .comments-section {
+            background: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .comments-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+
+        .comment-form {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 6px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 5px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-family: 'Lora', serif;
+            font-size: 14px;
+        }
+
+        .form-group textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .submit-comment-btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 24px;
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .submit-comment-btn:hover {
+            background: #5568d3;
+        }
+
+        .comments-list {
+            list-style: none;
+        }
+
+        .comment-item {
+            padding: 20px 0;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comment-item:last-child {
+            border-bottom: none;
+        }
+
+        .comment-author {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .comment-date {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            color: #999;
+            margin-bottom: 8px;
+        }
+
+        .comment-text {
+            font-family: 'Lora', serif;
+            font-size: 15px;
+            line-height: 1.6;
+            color: #444;
+        }
+
+        /* ========================================
+           MODAL
+           ======================================== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.7);
+            z-index: 2000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 8px;
+            padding: 35px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            background: none;
+            border: none;
+            font-size: 28px;
+            cursor: pointer;
+            color: #999;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #333;
+        }
+
+        .modal-content h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            margin-bottom: 20px;
+        }
+
+        .modal-content p {
+            font-family: 'Lora', serif;
+            font-size: 16px;
+            line-height: 1.7;
+            color: #444;
+            margin-bottom: 15px;
+        }
+
+        /* ========================================
+           SEARCH OVERLAY
+           ======================================== */
+        .search-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(26, 26, 46, 0.95);
+            z-index: 2000;
+            padding: 50px;
+        }
+
+        .search-overlay.active {
+            display: block;
+        }
+
+        .search-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .search-close {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: none;
+            border: none;
+            color: white;
+            font-size: 36px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .search-input-wrapper {
+            margin-bottom: 30px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 20px 25px;
+            font-family: 'Inter', sans-serif;
+            font-size: 24px;
+            border: none;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .search-results {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .search-result-item {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .search-result-item:last-child {
+            border-bottom: none;
+        }
+
+        .search-result-title {
+            font-family: 'Roboto Slab', serif;
+            font-size: 18px;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .search-result-excerpt {
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+            color: #666;
+        }
+
+        /* ========================================
+           TOOLTIP
+           ======================================== */
+        .tooltip {
+            position: relative;
+            display: inline-block;
+            border-bottom: 1px dotted #999;
+            cursor: help;
+        }
+
+        .tooltip-text {
+            visibility: hidden;
+            opacity: 0;
+            background: #333;
+            color: white;
+            text-align: center;
+            padding: 8px 12px;
+            border-radius: 4px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            transition: opacity 0.3s;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        /* ========================================
+           CODE BLOCKS - Monospace fonts
+           ======================================== */
+        .code-example {
+            background: white;
+            border-radius: 8px;
+            padding: 25px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+
+        .code-example h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
+
+        pre {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 20px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: 'SF Mono', Monaco, Consolas, 'Courier New', monospace;
+        }
+
+        /* ========================================
+           FOOTER
+           ======================================== */
+        .footer {
+            background: #1a1a2e;
+            color: white;
+            padding: 40px 0 20px;
+            margin-top: 50px;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 30px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 30px;
+        }
+
+        .footer-column h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+        }
+
+        .footer-column ul {
+            list-style: none;
+        }
+
+        .footer-column li {
+            margin-bottom: 8px;
+        }
+
+        .footer-column a {
+            color: rgba(255,255,255,0.7);
+            text-decoration: none;
+            font-family: 'Source Sans 3', sans-serif;
+            font-size: 14px;
+        }
+
+        .footer-column a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 30px auto 0;
+            padding: 20px 30px 0;
+            border-top: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            font-family: 'Inter', sans-serif;
+            font-size: 13px;
+            color: rgba(255,255,255,0.5);
+        }
+
+        /* ========================================
+           SDK DEBUG PANEL - Excluded from encryption
+           ======================================== */
+        .sdk-debug-panel {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: #1a1a2e;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            font-family: 'SF Mono', Monaco, Consolas, monospace;
+            font-size: 11px;
+            z-index: 3000;
+            min-width: 250px;
+        }
+
+        .sdk-debug-panel h4 {
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 700;
+            margin-bottom: 10px;
+            color: #4CAF50;
+        }
+
+        .sdk-stat {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+
+        .sdk-stat-label {
+            color: #999;
+        }
+
+        .sdk-stat-value {
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .sdk-init-btn {
+            width: 100%;
+            margin-top: 10px;
+            padding: 8px;
+            background: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .sdk-init-btn:hover {
+            background: #45a049;
+        }
+
+        .sdk-init-btn:disabled {
+            background: #555;
+            cursor: not-allowed;
+        }
+
+        .sdk-status {
+            margin-top: 10px;
+            padding: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            font-size: 10px;
+        }
+
+        .sdk-status.success {
+            background: rgba(76, 175, 80, 0.2);
+            color: #4CAF50;
+        }
+
+        .sdk-status.error {
+            background: rgba(244, 67, 54, 0.2);
+            color: #f44336;
+        }
+
+        .sdk-status.info {
+            background: rgba(33, 150, 243, 0.2);
+            color: #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <!-- TEST SCENARIO: Sticky Navigation with Multiple Font Weights
+         Expected: SDK handles different font weights correctly
+    -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="#" class="nav-logo">NewsDaily</a>
+            <ul class="nav-links">
+                <li><a href="#world">World</a></li>
+                <li><a href="#business">Business</a></li>
+                <li class="nav-item">
+                    <a href="#tech">Tech</a>
+                    <!-- TEST SCENARIO: Dropdown Menu with Dynamic Visibility
+                         Expected: SDK encrypts dropdown content when visible
+                    -->
+                    <div class="dropdown-menu">
+                        <a href="#ai">Artificial Intelligence</a>
+                        <a href="#crypto">Cryptocurrency</a>
+                        <a href="#startups">Startups</a>
+                        <a href="#gadgets">Gadgets</a>
+                    </div>
+                </li>
+                <li><a href="#sports">Sports</a></li>
+                <li><a href="#culture">Culture</a></li>
+            </ul>
+            <button class="nav-search-btn" onclick="triggerSDKSearch()">Search</button>
+        </div>
+    </nav>
+
+    <!-- TEST SCENARIO: Live-Updating Breaking News Ticker
+         Content rotates via JavaScript
+         Expected: Ticker excluded from encryption (uses data-cloak-exclude attribute)
+         Note: Server's plaintext was captured at initial page load, but ticker changes
+               every 5 seconds client-side. Using data-cloak-exclude ensures it remains
+               unencrypted and displays with system fonts.
+    -->
+    <div class="breaking-news" data-cloak-exclude>
+        <div class="ticker-wrapper">
+            <div class="ticker-label">Breaking</div>
+            <div class="ticker-content" id="ticker-content">
+                <span>Global markets surge on positive economic data</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <main>
+            <!-- TEST SCENARIO: Hero Article with Multiple Font Families
+                 Playfair Display (title), Lora (body), Inter (metadata)
+                 Expected: SDK creates separate CloakFont for each family
+            -->
+            <article class="hero-article">
+                <div class="hero-image">Hero Image Placeholder</div>
+                <div class="hero-content">
+                    <span class="hero-category">Technology</span>
+                    <h1 class="hero-title">The Future of Artificial Intelligence: From Research Labs to Real-World Applications</h1>
+                    <p class="hero-excerpt">
+                        As AI systems become increasingly sophisticated, researchers and engineers
+                        are racing to bridge the gap between cutting-edge algorithms and practical,
+                        everyday applications that can benefit society.
+                    </p>
+                    <div class="hero-meta">
+                        <span class="author-name">Dr. Sarah Chen</span>
+                        <span>•</span>
+                        <span>January 22, 2026</span>
+                        <span>•</span>
+                        <span>8 min read</span>
+                    </div>
+                </div>
+            </article>
+
+            <!-- TEST SCENARIO: Article Grid with Read More Expandable Content
+                 Expected: SDK encrypts revealed content when expanded
+            -->
+            <div class="article-grid" id="article-grid">
+                <article class="article-card">
+                    <div class="article-card-image">Article Image 1</div>
+                    <div class="article-card-content">
+                        <span class="article-card-category">Business</span>
+                        <h2 class="article-card-title">Startups Navigate Uncertain Economic Climate</h2>
+                        <p class="article-card-excerpt">
+                            Tech startups are adapting their strategies as investors become more
+                            cautious about valuations and growth projections.
+                        </p>
+                        <div class="read-more-wrapper">
+                            <div class="read-more-content" id="readmore-1">
+                                <p class="article-card-excerpt">
+                                    Industry experts suggest focusing on sustainable growth and
+                                    profitability rather than rapid expansion at all costs. This
+                                    shift represents a fundamental change in Silicon Valley culture.
+                                </p>
+                            </div>
+                            <button class="read-more-btn" onclick="toggleReadMore('readmore-1', this)">
+                                Read More
+                            </button>
+                        </div>
+                        <div class="article-card-meta">By James Rodriguez • 5 min read</div>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-card-image">Article Image 2</div>
+                    <div class="article-card-content">
+                        <span class="article-card-category">Science</span>
+                        <h2 class="article-card-title">Breakthrough in Quantum Computing Research</h2>
+                        <p class="article-card-excerpt">
+                            Scientists achieve new milestone in quantum error correction, bringing
+                            practical quantum computers closer to reality.
+                        </p>
+                        <div class="read-more-wrapper">
+                            <div class="read-more-content" id="readmore-2">
+                                <p class="article-card-excerpt">
+                                    The research team demonstrated a 99.9% error correction rate,
+                                    a critical threshold for building stable quantum systems capable
+                                    of solving real-world problems.
+                                </p>
+                            </div>
+                            <button class="read-more-btn" onclick="toggleReadMore('readmore-2', this)">
+                                Read More
+                            </button>
+                        </div>
+                        <div class="article-card-meta">By Dr. Maria Garcia • 6 min read</div>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-card-image">Article Image 3</div>
+                    <div class="article-card-content">
+                        <span class="article-card-category">Environment</span>
+                        <h2 class="article-card-title">Renewable Energy Adoption Accelerates Globally</h2>
+                        <p class="article-card-excerpt">
+                            Countries worldwide are exceeding their clean energy targets as solar
+                            and wind power become increasingly cost-competitive.
+                        </p>
+                        <div class="article-card-meta">By Emma Thompson • 4 min read</div>
+                    </div>
+                </article>
+
+                <article class="article-card">
+                    <div class="article-card-image">Article Image 4</div>
+                    <div class="article-card-content">
+                        <span class="article-card-category">Health</span>
+                        <h2 class="article-card-title">New mRNA Vaccine Platform Shows Promise</h2>
+                        <p class="article-card-excerpt">
+                            Researchers develop adaptable vaccine technology that could rapidly
+                            respond to emerging infectious diseases.
+                        </p>
+                        <div class="article-card-meta">By Dr. Michael Lee • 7 min read</div>
+                    </div>
+                </article>
+            </div>
+
+            <!-- TEST SCENARIO: Load More Button - Dynamic Content Injection
+                 Trigger: Click "Load More Articles"
+                 Expected: New articles encrypted by MutationObserver
+            -->
+            <div class="load-more-section">
+                <button class="load-more-btn" id="load-more-btn" onclick="loadMoreArticles()">
+                    Load More Articles
+                </button>
+            </div>
+
+            <!-- TEST SCENARIO: Tabs Interface - Content Loaded on Tab Switch
+                 Expected: Tab content encrypted when switched
+            -->
+            <div class="tabs-container">
+                <div class="tabs-header">
+                    <button class="tab-button active" onclick="switchTab(0)">Latest News</button>
+                    <button class="tab-button" onclick="switchTab(1)">Analysis</button>
+                    <button class="tab-button" onclick="switchTab(2)">Opinion</button>
+                </div>
+
+                <div class="tab-content active" id="tab-0">
+                    <h3>Breaking Stories from Around the World</h3>
+                    <p>
+                        Stay informed with real-time updates on the most important events shaping
+                        our world. Our newsroom operates 24/7 to bring you accurate, verified
+                        information as stories develop.
+                    </p>
+                    <p>
+                        From political developments to scientific breakthroughs, we cover the
+                        stories that matter most to you and your community.
+                    </p>
+                </div>
+
+                <div class="tab-content" id="tab-1">
+                    <h3>In-Depth Analysis and Expert Commentary</h3>
+                    <p>
+                        Our team of experienced journalists and subject matter experts provides
+                        context and analysis to help you understand the deeper implications of
+                        current events.
+                    </p>
+                    <p>
+                        We go beyond the headlines to explore the <span class="tooltip">nuanced factors
+                        <span class="tooltip-text">Complex, subtle aspects of a situation</span></span>
+                        driving global trends and local impacts.
+                    </p>
+                </div>
+
+                <div class="tab-content" id="tab-2">
+                    <h3>Diverse Perspectives and Editorial Views</h3>
+                    <p>
+                        Read thought-provoking opinions from a wide range of contributors,
+                        including academics, policymakers, business leaders, and community voices.
+                    </p>
+                    <p>
+                        We believe in presenting multiple viewpoints to foster informed public
+                        discourse and critical thinking.
+                    </p>
+                </div>
+            </div>
+
+            <!-- TEST SCENARIO: Accordion FAQ Section
+                 Expected: Content encrypted when accordion opens
+            -->
+            <div class="accordion-container">
+                <h2 style="font-family: 'Playfair Display', serif; font-size: 32px; margin-bottom: 20px;">
+                    Frequently Asked Questions
+                </h2>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="accordion-title">How can I access premium content?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>
+                                Premium content is available to all subscribers. You can subscribe
+                                to our service for $9.99/month or $99/year. Subscribers get unlimited
+                                access to all articles, newsletters, and exclusive features.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="accordion-title">Can I share articles with friends?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>
+                                Yes! We encourage sharing. Each article has social sharing buttons,
+                                and subscribers can gift up to 5 articles per month to non-subscribers.
+                                This helps us reach new readers while supporting quality journalism.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <div class="accordion-header" onclick="toggleAccordion(this)">
+                        <h3 class="accordion-title">Do you offer student discounts?</h3>
+                        <span class="accordion-icon">+</span>
+                    </div>
+                    <div class="accordion-content">
+                        <div class="accordion-content-inner">
+                            <p>
+                                Absolutely. Students with a valid .edu email address receive 50% off
+                                our standard subscription rate. We believe in making quality journalism
+                                accessible to the next generation of informed citizens.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- TEST SCENARIO: Lazy Load Section - IntersectionObserver
+                 Trigger: Scroll to this section
+                 Expected: Content encrypted when section becomes visible
+            -->
+            <div class="lazy-load-section" id="lazy-section-1">
+                <div class="code-example">
+                    <h3>Developer Integration Example</h3>
+                    <p style="font-family: 'Lora', serif; font-size: 16px; margin-bottom: 15px;">
+                        Integrate our API with just a few lines of code:
+                    </p>
+                    <pre><code>// Initialize the NewsDaily API
+const newsAPI = new NewsDaily({
+    apiKey: 'your-api-key-here',
+    region: 'us',
+    language: 'en'
+});
+
+// Fetch latest headlines
+const headlines = await newsAPI.getHeadlines({
+    category: 'technology',
+    limit: 10
+});
+
+// Display articles
+headlines.forEach(article => {
+    console.log(article.title);
+    console.log(article.excerpt);
+});</code></pre>
+                </div>
+            </div>
+
+            <!-- TEST SCENARIO: Comments Section with Form Submission
+                 Trigger: Submit comment form
+                 Expected: New comment encrypted when added to DOM
+            -->
+            <div class="comments-section">
+                <h2 class="comments-title">Comments</h2>
+
+                <div class="comment-form">
+                    <h3 style="font-family: 'Inter', sans-serif; font-size: 16px; margin-bottom: 15px;">
+                        Join the Discussion
+                    </h3>
+                    <form onsubmit="submitComment(event)">
+                        <div class="form-group">
+                            <label for="comment-name">Name</label>
+                            <input type="text" id="comment-name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="comment-text">Comment</label>
+                            <textarea id="comment-text" required></textarea>
+                        </div>
+                        <button type="submit" class="submit-comment-btn">Post Comment</button>
+                    </form>
+                </div>
+
+                <ul class="comments-list" id="comments-list">
+                    <li class="comment-item">
+                        <div class="comment-author">Alex Johnson</div>
+                        <div class="comment-date">2 hours ago</div>
+                        <div class="comment-text">
+                            This is a fascinating article! The implications for renewable energy
+                            adoption are huge. I'd love to see more coverage on the economic impacts.
+                        </div>
+                    </li>
+                    <li class="comment-item">
+                        <div class="comment-author">Patricia Williams</div>
+                        <div class="comment-date">5 hours ago</div>
+                        <div class="comment-text">
+                            Great reporting as always. The quantum computing breakthrough could
+                            revolutionize everything from drug discovery to climate modeling.
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- TEST SCENARIO: Modal with Button Trigger
+                 Expected: Modal content encrypted when opened
+            -->
+            <div style="text-align: center; margin: 40px 0;">
+                <button class="load-more-btn" onclick="openModal()">
+                    Subscribe to Newsletter
+                </button>
+            </div>
+
+        </main>
+
+        <!-- SIDEBAR -->
+        <aside class="sidebar">
+            <!-- TEST SCENARIO: Trending Stories Widget
+                 Multiple font families in compact layout
+                 Expected: All fonts handled correctly
+            -->
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Trending Stories</h3>
+                <ul class="trending-list">
+                    <li class="trending-item">
+                        <div class="trending-number">1</div>
+                        <div class="trending-text">
+                            Climate summit reaches historic agreement on carbon emissions
+                        </div>
+                    </li>
+                    <li class="trending-item">
+                        <div class="trending-number">2</div>
+                        <div class="trending-text">
+                            Tech giant announces revolutionary AI assistant features
+                        </div>
+                    </li>
+                    <li class="trending-item">
+                        <div class="trending-number">3</div>
+                        <div class="trending-text">
+                            Space agency confirms water ice deposits on lunar poles
+                        </div>
+                    </li>
+                    <li class="trending-item">
+                        <div class="trending-number">4</div>
+                        <div class="trending-text">
+                            Medical breakthrough offers hope for Alzheimer's patients
+                        </div>
+                    </li>
+                    <li class="trending-item">
+                        <div class="trending-number">5</div>
+                        <div class="trending-text">
+                            Global markets react to unexpected policy announcement
+                        </div>
+                    </li>
+                </ul>
+            </div>
+
+            <div class="sidebar-widget">
+                <h3 class="widget-title">Newsletter</h3>
+                <p style="font-family: 'Source Sans 3', sans-serif; font-size: 14px; line-height: 1.6; color: #555; margin-bottom: 15px;">
+                    Get the day's top stories delivered to your inbox every morning.
+                </p>
+                <button class="load-more-btn" style="padding: 10px 20px; font-size: 13px;" onclick="openModal()">
+                    Subscribe Now
+                </button>
+            </div>
+        </aside>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-column">
+                <h4>News</h4>
+                <ul>
+                    <li><a href="#world">World News</a></li>
+                    <li><a href="#politics">Politics</a></li>
+                    <li><a href="#business">Business</a></li>
+                    <li><a href="#tech">Technology</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Features</h4>
+                <ul>
+                    <li><a href="#opinion">Opinion</a></li>
+                    <li><a href="#analysis">Analysis</a></li>
+                    <li><a href="#longform">Long Reads</a></li>
+                    <li><a href="#podcasts">Podcasts</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Company</h4>
+                <ul>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#contact">Contact</a></li>
+                    <li><a href="#careers">Careers</a></li>
+                    <li><a href="#press">Press Room</a></li>
+                </ul>
+            </div>
+            <div class="footer-column">
+                <h4>Legal</h4>
+                <ul>
+                    <li><a href="#privacy">Privacy Policy</a></li>
+                    <li><a href="#terms">Terms of Service</a></li>
+                    <li><a href="#cookies">Cookie Policy</a></li>
+                    <li><a href="#accessibility">Accessibility</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            © 2026 NewsDaily. All rights reserved.
+        </div>
+    </footer>
+
+    <!-- MODAL OVERLAY -->
+    <div class="modal-overlay" id="modal-overlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <button class="modal-close" onclick="closeModal()">×</button>
+            <h2>Subscribe to Our Newsletter</h2>
+            <p>
+                Join over 100,000 readers who start their day with our curated news digest.
+                Get the most important stories delivered straight to your inbox.
+            </p>
+            <p>
+                Our newsletter features exclusive analysis, breaking news alerts, and
+                behind-the-scenes insights from our newsroom.
+            </p>
+            <div style="margin-top: 25px;">
+                <input type="email" placeholder="Enter your email"
+                       style="width: 100%; padding: 12px; border: 1px solid #ddd; border-radius: 4px;
+                              font-family: 'Inter', sans-serif; font-size: 14px; margin-bottom: 12px;">
+                <button class="load-more-btn" style="padding: 12px 30px; font-size: 14px;">
+                    Subscribe Free
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- SEARCH OVERLAY -->
+    <div class="search-overlay" id="search-overlay">
+        <button class="search-close" onclick="closeSearch()">×</button>
+        <div class="search-container">
+            <div class="search-input-wrapper">
+                <input type="text" class="search-input" placeholder="Search articles..."
+                       id="search-input" oninput="performSearch()">
+            </div>
+            <div class="search-results" id="search-results">
+                <div class="search-result-item">
+                    <div class="search-result-title">AI Breakthrough in Natural Language Processing</div>
+                    <div class="search-result-excerpt">
+                        New model achieves human-level performance on complex reasoning tasks...
+                    </div>
+                </div>
+                <div class="search-result-item">
+                    <div class="search-result-title">Global Climate Initiative Launches</div>
+                    <div class="search-result-excerpt">
+                        Nations commit to ambitious carbon reduction targets for 2030...
+                    </div>
+                </div>
+                <div class="search-result-item">
+                    <div class="search-result-title">Quantum Computing Reaches New Milestone</div>
+                    <div class="search-result-excerpt">
+                        Researchers demonstrate error correction at unprecedented scale...
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SDK DEBUG PANEL - EXCLUDED FROM ENCRYPTION -->
+    <div class="sdk-debug-panel" data-cloak-exclude>
+        <h4>Cloak SDK Debug</h4>
+        <div class="sdk-stat">
+            <span class="sdk-stat-label">Status:</span>
+            <span class="sdk-stat-value" id="sdk-status-text">Not initialized</span>
+        </div>
+        <div class="sdk-stat">
+            <span class="sdk-stat-label">Characters:</span>
+            <span class="sdk-stat-value" id="sdk-chars">0</span>
+        </div>
+        <div class="sdk-stat">
+            <span class="sdk-stat-label">Nodes:</span>
+            <span class="sdk-stat-value" id="sdk-nodes">0</span>
+        </div>
+        <button class="sdk-init-btn" id="sdk-init-btn" onclick="initCloakSDK()">Initialize SDK</button>
+        <div class="sdk-status info" id="sdk-status-msg" style="display: none;"></div>
+    </div>
+
+    <!-- Load Cloak SDK -->
+    <script src="/client/cloak-sdk.js"></script>
+
+    <script>
+        // ========================================
+        // SDK INITIALIZATION
+        // ========================================
+        // Use the special 'test-key' for local development
+        // This key is hardcoded in routes_sdk.py and always valid for localhost
+        const testApiKey = 'test-key';
+
+        async function initCloakSDK() {
+            const statusEl = document.getElementById('sdk-status-msg');
+            const statusText = document.getElementById('sdk-status-text');
+            const initBtn = document.getElementById('sdk-init-btn');
+
+            try {
+                statusEl.style.display = 'block';
+                statusEl.className = 'sdk-status info';
+                statusEl.textContent = 'Initializing...';
+
+                // Initialize SDK
+                await CloakSDK.init({
+                    apiKey: testApiKey,
+                    apiBaseUrl: 'http://localhost:8001',
+                    debug: true
+                });
+
+                statusEl.className = 'sdk-status success';
+                statusEl.textContent = 'SDK initialized!';
+                statusText.textContent = 'Active';
+
+                // Update stats periodically
+                setInterval(updateSDKStats, 1000);
+                updateSDKStats();
+
+            } catch (error) {
+                statusEl.className = 'sdk-status error';
+                statusEl.textContent = 'Error: ' + error.message;
+                statusText.textContent = 'Error';
+                initBtn.disabled = false;
+                console.error('SDK init error:', error);
+            }
+        }
+
+        function updateSDKStats() {
+            const stats = CloakSDK.getStats();
+            document.getElementById('sdk-chars').textContent = stats.totalCharacters.toLocaleString();
+            document.getElementById('sdk-nodes').textContent = stats.nodeCount;
+        }
+
+        // Listen for SDK events
+        window.addEventListener('cloak:ready', (e) => {
+            console.log('Cloak SDK ready:', e.detail);
+        });
+
+        window.addEventListener('cloak:encrypted', (e) => {
+            console.log('Content encrypted:', e.detail);
+        });
+
+        // ========================================
+        // BREAKING NEWS TICKER ROTATION
+        // ========================================
+        const tickerHeadlines = [
+            'Global markets surge on positive economic data',
+            'Scientists achieve breakthrough in fusion energy research',
+            'International summit addresses climate emergency',
+            'Tech industry leaders call for AI safety regulations',
+            'Space agency announces new Mars exploration mission'
+        ];
+
+        let currentTickerIndex = 0;
+        setInterval(() => {
+            currentTickerIndex = (currentTickerIndex + 1) % tickerHeadlines.length;
+            document.getElementById('ticker-content').innerHTML =
+                `<span>${tickerHeadlines[currentTickerIndex]}</span>`;
+        }, 5000);
+
+        // ========================================
+        // LOAD MORE ARTICLES - Dynamic Injection
+        // ========================================
+        let articlesLoaded = 0;
+        const additionalArticles = [
+            {
+                category: 'Culture',
+                title: 'Museums Embrace Digital Art and NFT Exhibitions',
+                excerpt: 'Traditional art institutions are adapting to showcase digital creativity in innovative ways.',
+                author: 'Sofia Martinez',
+                time: '6 min read'
+            },
+            {
+                category: 'Sports',
+                title: 'Olympic Committee Announces New Esports Categories',
+                excerpt: 'Competitive gaming takes another step toward mainstream recognition in international sports.',
+                author: 'Marcus Taylor',
+                time: '3 min read'
+            },
+            {
+                category: 'Education',
+                title: 'AI-Powered Tutoring Shows Promising Results',
+                excerpt: 'Personalized learning systems are helping students achieve better outcomes across diverse subjects.',
+                author: 'Dr. Lisa Chang',
+                time: '5 min read'
+            },
+            {
+                category: 'Politics',
+                title: 'New Legislation Targets Social Media Privacy',
+                excerpt: 'Lawmakers introduce comprehensive data protection measures for online platforms.',
+                author: 'Robert Jenkins',
+                time: '7 min read'
+            }
+        ];
+
+        function loadMoreArticles() {
+            if (articlesLoaded >= additionalArticles.length) {
+                document.getElementById('load-more-btn').disabled = true;
+                document.getElementById('load-more-btn').textContent = 'No More Articles';
+                return;
+            }
+
+            const grid = document.getElementById('article-grid');
+            const article = additionalArticles[articlesLoaded];
+
+            const articleEl = document.createElement('article');
+            articleEl.className = 'article-card';
+            articleEl.innerHTML = `
+                <div class="article-card-image">Article Image ${5 + articlesLoaded}</div>
+                <div class="article-card-content">
+                    <span class="article-card-category">${article.category}</span>
+                    <h2 class="article-card-title">${article.title}</h2>
+                    <p class="article-card-excerpt">${article.excerpt}</p>
+                    <div class="article-card-meta">By ${article.author} • ${article.time}</div>
+                </div>
+            `;
+
+            grid.appendChild(articleEl);
+            articlesLoaded++;
+
+            if (articlesLoaded >= additionalArticles.length) {
+                document.getElementById('load-more-btn').textContent = 'Load More Articles';
+            }
+        }
+
+        // ========================================
+        // READ MORE EXPANDABLE CONTENT
+        // ========================================
+        function toggleReadMore(contentId, button) {
+            const content = document.getElementById(contentId);
+            const isExpanded = content.classList.contains('expanded');
+
+            if (isExpanded) {
+                content.classList.remove('expanded');
+                button.textContent = 'Read More';
+            } else {
+                content.classList.add('expanded');
+                button.textContent = 'Read Less';
+            }
+        }
+
+        // ========================================
+        // TABS INTERFACE
+        // ========================================
+        function switchTab(index) {
+            const buttons = document.querySelectorAll('.tab-button');
+            const contents = document.querySelectorAll('.tab-content');
+
+            buttons.forEach((btn, i) => {
+                if (i === index) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            contents.forEach((content, i) => {
+                if (i === index) {
+                    content.classList.add('active');
+                } else {
+                    content.classList.remove('active');
+                }
+            });
+        }
+
+        // ========================================
+        // ACCORDION
+        // ========================================
+        function toggleAccordion(header) {
+            const item = header.parentElement;
+            const content = header.nextElementSibling;
+            const isOpen = item.classList.contains('open');
+
+            // Close all other accordions
+            document.querySelectorAll('.accordion-item').forEach(acc => {
+                acc.classList.remove('open');
+                acc.querySelector('.accordion-content').style.maxHeight = '0';
+            });
+
+            // Toggle current accordion
+            if (!isOpen) {
+                item.classList.add('open');
+                content.style.maxHeight = content.scrollHeight + 'px';
+            }
+        }
+
+        // ========================================
+        // LAZY LOAD - IntersectionObserver
+        // ========================================
+        const lazyObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                    lazyObserver.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.lazy-load-section').forEach(section => {
+            lazyObserver.observe(section);
+        });
+
+        // ========================================
+        // COMMENTS SUBMISSION
+        // ========================================
+        function submitComment(event) {
+            event.preventDefault();
+
+            const name = document.getElementById('comment-name').value;
+            const text = document.getElementById('comment-text').value;
+
+            const commentsList = document.getElementById('comments-list');
+            const commentEl = document.createElement('li');
+            commentEl.className = 'comment-item';
+            commentEl.innerHTML = `
+                <div class="comment-author">${name}</div>
+                <div class="comment-date">Just now</div>
+                <div class="comment-text">${text}</div>
+            `;
+
+            commentsList.insertBefore(commentEl, commentsList.firstChild);
+
+            // Reset form
+            document.getElementById('comment-name').value = '';
+            document.getElementById('comment-text').value = '';
+        }
+
+        // ========================================
+        // MODAL
+        // ========================================
+        function openModal() {
+            document.getElementById('modal-overlay').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-overlay').classList.remove('active');
+        }
+
+        function closeModalOnOverlay(event) {
+            if (event.target === document.getElementById('modal-overlay')) {
+                closeModal();
+            }
+        }
+
+        // ========================================
+        // SEARCH OVERLAY
+        // ========================================
+        // UPDATED: Trigger SDK search instead of mockup search
+        // The SDK's search (Cmd+F) has full functionality including DOM change detection
+        function triggerSDKSearch() {
+            // Trigger SDK search by simulating Cmd+F / Ctrl+F
+            // The SDK intercepts this and shows its own search overlay
+            const event = new KeyboardEvent('keydown', {
+                key: 'f',
+                code: 'KeyF',
+                ctrlKey: navigator.platform.startsWith('Mac') ? false : true,
+                metaKey: navigator.platform.startsWith('Mac') ? true : false,
+                bubbles: true,
+                cancelable: true
+            });
+            document.dispatchEvent(event);
+        }
+
+        // OLD MOCKUP SEARCH (kept for reference but not used by Search button anymore)
+        function openSearch() {
+            document.getElementById('search-overlay').classList.add('active');
+            setTimeout(() => {
+                document.getElementById('search-input').focus();
+            }, 100);
+        }
+
+        function closeSearch() {
+            document.getElementById('search-overlay').classList.remove('active');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const results = document.getElementById('search-results');
+
+            if (query.length < 2) {
+                results.innerHTML = `
+                    <div class="search-result-item">
+                        <div class="search-result-title">AI Breakthrough in Natural Language Processing</div>
+                        <div class="search-result-excerpt">
+                            New model achieves human-level performance on complex reasoning tasks...
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+
+            results.innerHTML = `
+                <div class="search-result-item">
+                    <div class="search-result-title">Search results for "${query}"</div>
+                    <div class="search-result-excerpt">
+                        Found 23 articles matching your query. Refine your search for better results.
+                    </div>
+                </div>
+            `;
+        }
+
+        // ========================================
+        // INFINITE SCROLL SIMULATION
+        // ========================================
+        let infiniteScrollEnabled = true;
+        window.addEventListener('scroll', () => {
+            if (!infiniteScrollEnabled) return;
+
+            const scrollPosition = window.innerHeight + window.scrollY;
+            const documentHeight = document.documentElement.scrollHeight;
+
+            // Trigger when near bottom (200px threshold)
+            if (scrollPosition >= documentHeight - 200) {
+                infiniteScrollEnabled = false;
+
+                // Simulate loading more content
+                setTimeout(() => {
+                    loadMoreArticles();
+                    infiniteScrollEnabled = true;
+                }, 1000);
+            }
+        });
+
+        // Close search on Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeSearch();
+                closeModal();
+            }
+        });
+    </script>
+</body>
+</html>

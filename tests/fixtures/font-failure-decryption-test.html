@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Font Failure Decryption Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Font Failure Decryption Test</h1>
+    <p id="test-paragraph">Hello World - This should decrypt to plaintext if fonts fail</p>
+    <p>The quick brown fox jumps over the lazy dog.</p>
+    <p>ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz</p>
+
+    <div id="status">Initializing...</div>
+
+    <script src="/client/cloak-sdk.js"></script>
+    <script>
+        // Initialize SDK with deliberately broken font URL
+        // This will trigger font loading failure and test the decryption fallback
+        window.CloakSDK.init({
+            apiKey: 'test_key',
+            debug: true,
+            fontLoadTimeout: 3000  // Shorter timeout for faster testing
+        }).then(() => {
+            // Manually inject invalid font URL to simulate failure
+            // (In real scenario, server would provide this)
+            const style = document.getElementById('cloak-font-style');
+            if (style) {
+                // Replace valid font URL with invalid one
+                style.textContent = style.textContent.replace(
+                    /url\([^)]+\)/g,
+                    'url(https://invalid.test.404/font.woff2)'
+                );
+            }
+            document.getElementById('status').textContent = 'SDK initialized, font will fail to load...';
+        }).catch(err => {
+            document.getElementById('status').textContent = 'Error: ' + err.message;
+        });
+
+        // Expose test helpers for Playwright
+        window.__testHelpers = {
+            getDecryptedCount: () => {
+                // Count how many nodes have plaintext instead of encrypted text
+                const walker = document.createTreeWalker(
+                    document.body,
+                    NodeFilter.SHOW_TEXT,
+                    null
+                );
+                let count = 0;
+                let node;
+                while ((node = walker.nextNode())) {
+                    if (node._cloakEncrypted) {
+                        count++;
+                    }
+                }
+                return count;
+            },
+            hasGibberish: () => {
+                // Check if body contains typical encrypted characters (rotated)
+                const bodyText = document.body.textContent;
+                // Encrypted text would have shifted characters
+                // If we see "Khoor" instead of "Hello", that's gibberish
+                // But this is hard to detect reliably, so we'll check if text is readable
+                return !/Hello World/.test(bodyText);
+            }
+        };
+    </script>
+</body>
+</html>

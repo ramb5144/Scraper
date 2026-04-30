@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cloak SDK Test Page</title>
+    <!-- Google Fonts - Lora (serif) for body, Roboto for headings -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,700;1,400&family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Lora', Georgia, serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+            background: #fafafa;
+        }
+        h1 {
+            font-family: 'Roboto', sans-serif;
+            color: #333;
+            border-bottom: 2px solid #333;
+            padding-bottom: 10px;
+        }
+        h2 {
+            font-family: 'Roboto', sans-serif;
+            color: #555;
+            margin-top: 30px;
+        }
+        h3 {
+            font-family: 'Roboto', sans-serif;
+        }
+        .article {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin: 20px 0;
+        }
+        .controls {
+            background: #333;
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .controls h3 {
+            margin-top: 0;
+            color: #4CAF50;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin: 5px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        #status {
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-family: monospace;
+            font-size: 12px;
+        }
+        #status.success { background: #d4edda; color: #155724; }
+        #status.error { background: #f8d7da; color: #721c24; }
+        #status.info { background: #e7f3fe; color: #0c5460; }
+        .lazy-content {
+            display: none;
+            padding: 20px;
+            background: #fffde7;
+            border-left: 4px solid #ffc107;
+            margin: 10px 0;
+        }
+        .lazy-content.visible {
+            display: block;
+        }
+        #dynamic-content {
+            min-height: 100px;
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 10px 0;
+        }
+        .stats {
+            font-family: monospace;
+            font-size: 12px;
+            background: #f5f5f5;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        blockquote {
+            border-left: 4px solid #4CAF50;
+            padding-left: 20px;
+            margin-left: 0;
+            font-style: italic;
+            color: #555;
+        }
+    </style>
+</head>
+<body>
+    <!-- SDK Control Panel - excluded from encryption -->
+    <div class="controls" data-cloak-exclude>
+        <h3>Cloak SDK Control Panel</h3>
+        <div>
+            <button id="btn-init" onclick="initSDK()">Initialize SDK</button>
+            <button id="btn-add-content" onclick="addDynamicContent()" disabled>Add Dynamic Content</button>
+            <button id="btn-lazy-load" onclick="showLazyContent()" disabled>Simulate Lazy Load</button>
+            <button id="btn-stats" onclick="showStats()" disabled>Show Stats</button>
+        </div>
+        <div id="status" class="info">Click "Initialize SDK" to start</div>
+        <div class="stats" id="stats-display" style="display:none;"></div>
+    </div>
+
+    <!-- Article Content -->
+    <article class="article">
+        <h1>The Future of Web Content Protection</h1>
+
+        <p class="lead">
+            In an era where content theft and unauthorized scraping have become rampant,
+            innovative solutions are emerging to protect digital publishers and creators.
+        </p>
+
+        <h2>The Challenge of Content Protection</h2>
+        <p>
+            Every day, millions of articles are scraped from legitimate news sources and
+            republished without permission. This not only violates copyright but also
+            undermines the economic viability of quality journalism.
+        </p>
+        <p>
+            Traditional approaches like paywalls and DRM have proven to be either too
+            restrictive for legitimate users or too easy to circumvent by determined actors.
+        </p>
+
+        <h2>A New Approach: Font-Based Encryption</h2>
+        <p>
+            The Cloak SDK represents a paradigm shift in content protection. Instead of
+            encrypting the content itself in a way that requires decryption before display,
+            it encrypts the text at the character level using a custom font.
+        </p>
+        <blockquote>
+            "The browser displays the content perfectly, but the underlying text is
+            completely scrambled. Scraping the HTML gives you gibberish."
+        </blockquote>
+        <p>
+            This approach maintains all the advantages of regular web content:
+        </p>
+        <ul>
+            <li>Full searchability with custom search implementation</li>
+            <li>Copy-paste returns the original text for legitimate users</li>
+            <li>Text selection and highlighting work normally</li>
+            <li>Screen readers can be supported with proper configuration</li>
+            <li>SEO-friendly rendering for search engines</li>
+        </ul>
+
+        <h2>How It Works</h2>
+        <p>
+            The SDK operates in several stages:
+        </p>
+        <ol>
+            <li><strong>Initialization:</strong> The SDK connects to the API, validates the key, and receives encryption parameters.</li>
+            <li><strong>Font Loading:</strong> A custom WOFF2 font is generated with glyphs mapped to the encryption scheme.</li>
+            <li><strong>Text Encryption:</strong> All text content is encrypted character-by-character.</li>
+            <li><strong>Observation:</strong> A MutationObserver watches for dynamically added content.</li>
+        </ol>
+
+        <!-- Lazy Load Section -->
+        <div id="lazy-section" class="lazy-content">
+            <h3>Dynamically Loaded Section</h3>
+            <p>
+                This content was hidden initially and revealed later, simulating lazy loading
+                or infinite scroll patterns common on modern websites.
+            </p>
+            <p>
+                The SDK automatically encrypts this content when it becomes visible,
+                demonstrating its ability to handle dynamic page updates.
+            </p>
+        </div>
+
+        <!-- Dynamic Content Injection Point -->
+        <div id="dynamic-content">
+            <p style="color: #999;">Dynamic content will appear here when you click "Add Dynamic Content"</p>
+        </div>
+
+        <h2>Integration Guide</h2>
+        <p>
+            Integrating the Cloak SDK is straightforward. Simply add the script tag to your page:
+        </p>
+        <pre style="background: #f5f5f5; padding: 15px; overflow-x: auto;"><code>&lt;script src="https://api.cloaktext.com/sdk.js"
+        data-api-key="your_api_key"&gt;&lt;/script&gt;</code></pre>
+        <p>
+            Or initialize programmatically for more control:
+        </p>
+        <pre style="background: #f5f5f5; padding: 15px; overflow-x: auto;"><code>CloakSDK.init({
+    apiKey: 'your_api_key',
+    debug: true
+});</code></pre>
+
+        <h2>Performance Considerations</h2>
+        <p>
+            The SDK is designed for minimal performance impact:
+        </p>
+        <ul>
+            <li>Batch processing of DOM mutations to reduce reflows</li>
+            <li>Efficient character mapping using lookup tables</li>
+            <li>Font caching for repeat visits</li>
+            <li>Lazy initialization of features not immediately needed</li>
+        </ul>
+    </article>
+
+    <!-- Load the SDK -->
+    <script src="/client/cloak-sdk.js"></script>
+
+    <script>
+        // API key for testing (create one first via admin endpoint)
+        let testApiKey = localStorage.getItem('cloak_test_api_key') || '';
+
+        async function initSDK() {
+            const statusEl = document.getElementById('status');
+            const btnInit = document.getElementById('btn-init');
+
+            try {
+                statusEl.className = 'info';
+                statusEl.textContent = 'Initializing SDK...';
+                btnInit.disabled = true;
+
+                // If no API key, create one first
+                if (!testApiKey) {
+                    statusEl.textContent = 'Creating test API key...';
+
+                    const createResponse = await fetch('/api/sdk/admin/create-key', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            admin_secret: 'dT3R3RS$gSSQhhK5AiqG',
+                            name: 'Test Key',
+                            allowed_domains: ['localhost', '127.0.0.1'],
+                            usage_limit: 0 // unlimited for testing
+                        })
+                    });
+
+                    if (!createResponse.ok) {
+                        throw new Error('Failed to create API key');
+                    }
+
+                    const keyData = await createResponse.json();
+                    testApiKey = keyData.api_key;
+                    localStorage.setItem('cloak_test_api_key', testApiKey);
+                    console.log('Created test API key:', testApiKey);
+                }
+
+                statusEl.textContent = 'Initializing with API key: ' + testApiKey.substring(0, 20) + '...';
+
+                // Initialize the SDK
+                try {
+                    await CloakSDK.init({
+                        apiKey: testApiKey,
+                        apiBaseUrl: 'http://localhost:8001',
+                        debug: true
+                    });
+                } catch (initError) {
+                    // If init fails with 401 or "Invalid API key", the key may have been deleted - create a new one
+                    const errorMsg = initError.message || '';
+                    if (errorMsg.includes('401') || errorMsg.includes('Invalid') || errorMsg.includes('Unauthorized')) {
+                        console.log('API key invalid, creating new one...');
+                        localStorage.removeItem('cloak_test_api_key');
+                        testApiKey = '';
+                        btnInit.disabled = false;
+                        return initSDK(); // Retry with new key
+                    }
+                    throw initError;
+                }
+
+                statusEl.className = 'success';
+                statusEl.textContent = 'SDK initialized successfully! Text is now encrypted.';
+
+                // Enable other buttons
+                document.getElementById('btn-add-content').disabled = false;
+                document.getElementById('btn-lazy-load').disabled = false;
+                document.getElementById('btn-stats').disabled = false;
+
+                // Show initial stats
+                showStats();
+
+            } catch (error) {
+                statusEl.className = 'error';
+                statusEl.textContent = 'Error: ' + error.message;
+                btnInit.disabled = false;
+                console.error('SDK init error:', error);
+            }
+        }
+
+        function addDynamicContent() {
+            const container = document.getElementById('dynamic-content');
+            const timestamp = new Date().toLocaleTimeString();
+
+            const newContent = document.createElement('div');
+            newContent.innerHTML = `
+                <h3>Dynamic Article Section</h3>
+                <p>
+                    This paragraph was added dynamically at ${timestamp}.
+                    The SDK should automatically encrypt this new content
+                    using the MutationObserver.
+                </p>
+                <p>
+                    Notice how the text appears encrypted (if you inspect the DOM)
+                    but displays correctly because of the custom font.
+                </p>
+            `;
+
+            container.innerHTML = '';
+            container.appendChild(newContent);
+
+            document.getElementById('status').textContent = 'Dynamic content added at ' + timestamp;
+
+            // Update stats after a brief delay (for batching)
+            setTimeout(showStats, 100);
+        }
+
+        function showLazyContent() {
+            const lazySection = document.getElementById('lazy-section');
+            lazySection.classList.add('visible');
+
+            document.getElementById('status').textContent = 'Lazy content revealed - should be encrypted automatically';
+
+            // Update stats after a brief delay
+            setTimeout(showStats, 100);
+        }
+
+        function showStats() {
+            const stats = CloakSDK.getStats();
+            const statsDisplay = document.getElementById('stats-display');
+
+            statsDisplay.style.display = 'block';
+            statsDisplay.innerHTML = `
+                <strong>SDK Statistics:</strong><br>
+                Initialized: ${stats.initialized}<br>
+                Total Characters Encrypted: ${stats.totalCharacters.toLocaleString()}<br>
+                Text Nodes Tracked: ${stats.nodeCount}
+            `;
+        }
+
+        // Listen for SDK ready event
+        window.addEventListener('cloak:ready', (e) => {
+            console.log('Cloak SDK ready event:', e.detail);
+        });
+    </script>
+</body>
+</html>
